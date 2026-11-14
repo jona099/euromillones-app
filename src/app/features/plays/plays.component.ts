@@ -17,9 +17,14 @@ import { Favorite, Play, Profile, TicketPhoto, Week } from '../../core/models';
 const exactLength = (n: number) => (c: AbstractControl<number[]>): ValidationErrors | null =>
   c.value?.length === n ? null : { exactLength: n };
 
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.component';
+import { LoaderComponent } from '../../shared/loader/loader.component';
+import { delayedLoading } from '../../shared/skeleton/delayed-loading';
+
 @Component({
   selector: 'app-plays',
-  imports: [ReactiveFormsModule, NumberPickerComponent, ComboComponent, AvatarComponent, IconComponent, DatePipe, CurrencyPipe],
+  imports: [SkeletonComponent, SkeletonComboComponent, LoaderComponent, ReactiveFormsModule, NumberPickerComponent, ComboComponent, AvatarComponent, IconComponent, DatePipe, CurrencyPipe],
   templateUrl: './plays.component.html',
   styleUrl: './plays.component.scss',
 })
@@ -41,6 +46,8 @@ export class PlaysComponent implements OnInit {
   protected readonly photos = signal<TicketPhoto[]>([]);
   protected readonly prizeByPlay = signal<Map<number, number>>(new Map());
   protected readonly loading = signal(true);
+  /** Skeleton sin parpadeo: aparece tras 150 ms y dura al menos 300 ms. */
+  protected readonly skeleton = delayedLoading(this.loading);
   protected readonly saving = signal(false);
   protected readonly uploading = signal(false);
   protected readonly error = signal<string | null>(null);

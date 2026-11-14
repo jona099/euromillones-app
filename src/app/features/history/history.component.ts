@@ -13,9 +13,13 @@ interface Row {
   month: string;   // yyyy-MM
 }
 
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.component';
+import { delayedLoading } from '../../shared/skeleton/delayed-loading';
+
 @Component({
   selector: 'app-history',
-  imports: [CurrencyPipe, DatePipe, ComboComponent, AvatarComponent, IconComponent],
+  imports: [SkeletonComponent, SkeletonComboComponent, CurrencyPipe, DatePipe, ComboComponent, AvatarComponent, IconComponent],
   templateUrl: './history.component.html',
   styleUrl: './history.component.scss',
 })
@@ -24,6 +28,8 @@ export class HistoryComponent implements OnInit {
 
   protected readonly data = signal<PenaData | null>(null);
   protected readonly loading = signal(true);
+  /** Skeleton sin parpadeo: aparece tras 150 ms y dura al menos 300 ms. */
+  protected readonly skeleton = delayedLoading(this.loading);
 
   // Filtros
   protected readonly person = signal<string>('all');

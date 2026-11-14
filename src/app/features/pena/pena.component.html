@@ -3,9 +3,41 @@
   <p class="muted">Cuentas claras, quién tiene más suerte y los números que más jugáis.</p>
 </header>
 
-@if (loading()) {
-  <p class="muted">Cargando…</p>
-} @else {
+@if (skeleton()) {
+  <div class="sk-stack" aria-busy="true"><span class="sr-only" role="status">Cargando…</span>
+    <section class="card">
+      <div class="card-title"><app-skeleton w="6rem" h="1.1rem" /><app-skeleton w="8rem" h="2rem" /></div>
+      <app-skeleton w="90%" h="0.75rem" /><app-skeleton w="70%" h="0.75rem" class="sk-mt-sm" />
+      <div class="balances sk-mt-lg">
+        @for (i of [0, 1, 2]; track i) {
+          <article class="balance">
+            <div class="sk-row"><app-skeleton variant="circle" w="38px" /><div class="sk-col"><app-skeleton w="5rem" /><app-skeleton w="3.5rem" h="0.7rem" /></div></div>
+            <app-skeleton w="7rem" h="1.8rem" r="0.5rem" class="sk-mt" />
+            <app-skeleton h="0.7rem" class="sk-mt" /><app-skeleton h="0.7rem" class="sk-mt-sm" /><app-skeleton w="80%" h="0.7rem" class="sk-mt-sm" />
+          </article>
+        }
+      </div>
+    </section>
+    <div class="two">
+      <section class="card">
+        <app-skeleton w="10rem" h="1.1rem" />
+        @for (i of [0, 1, 2]; track i) {
+          <div class="sk-row sk-divider">
+            <app-skeleton variant="circle" w="1.6rem" /><app-skeleton variant="circle" w="40px" />
+            <div class="sk-col"><app-skeleton w="50%" /><app-skeleton w="80%" h="0.7rem" /><app-skeleton h="0.45rem" /></div>
+            <app-skeleton w="4rem" h="1rem" />
+          </div>
+        }
+      </section>
+      <section class="card">
+        <app-skeleton w="11rem" h="1.1rem" />
+        <div class="heat sk-mt">
+          @for (n of range50; track n) { <app-skeleton variant="block" h="auto" class="sk-cell" r="0.45rem" /> }
+        </div>
+      </section>
+    </div>
+  </div>
+} @else if (!loading()) {
   <!-- ===================== CUENTAS ===================== -->
   <section class="card">
     <h2 class="card-title">
@@ -78,8 +110,8 @@
         <label class="wide">Concepto
           <input type="text" formControlName="note" placeholder="Bizum, efectivo…" maxlength="60" />
         </label>
-        <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid || form.value.from_id === form.value.to_id">
-          Guardar pago
+        <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid || form.value.from_id === form.value.to_id" [attr.aria-busy]="saving()">
+          @if (saving()) { <app-loader /> Guardando… } @else { Guardar pago }
         </button>
       </form>
     }

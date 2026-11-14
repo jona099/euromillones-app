@@ -4,9 +4,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LogoComponent } from '../../shared/brand/logo.component';
 
+import { LoaderComponent } from '../../shared/loader/loader.component';
+
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, LogoComponent],
+  imports: [ReactiveFormsModule, LogoComponent, LoaderComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

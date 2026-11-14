@@ -40,7 +40,8 @@
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <button class="btn-primary" type="submit" [disabled]="loading()">
+    <button class="btn-primary" type="submit" [disabled]="loading()" [attr.aria-busy]="loading()">
+      @if (loading()) { <app-loader /> }
       {{ loading() ? 'Entrando…' : 'Entrar' }}
     </button>
   </form>

@@ -8,9 +8,14 @@ import { ComboComponent } from '../../shared/combo/combo.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { Play, Profile } from '../../core/models';
 
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.component';
+import { LoaderComponent } from '../../shared/loader/loader.component';
+import { delayedLoading } from '../../shared/skeleton/delayed-loading';
+
 @Component({
   selector: 'app-prizes',
-  imports: [ReactiveFormsModule, ComboComponent, IconComponent, CurrencyPipe, DatePipe],
+  imports: [SkeletonComponent, SkeletonComboComponent, LoaderComponent, ReactiveFormsModule, ComboComponent, IconComponent, CurrencyPipe, DatePipe],
   templateUrl: './prizes.component.html',
   styleUrl: './prizes.component.scss',
 })
@@ -25,6 +30,8 @@ export class PrizesComponent implements OnInit {
   protected readonly plays = signal<Play[]>([]);
   protected readonly profiles = signal<Profile[]>([]);
   protected readonly loading = signal(true);
+  /** Skeleton sin parpadeo: aparece tras 150 ms y dura al menos 300 ms. */
+  protected readonly skeleton = delayedLoading(this.loading);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
 

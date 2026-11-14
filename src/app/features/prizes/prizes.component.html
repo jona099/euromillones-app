@@ -69,16 +69,20 @@
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid">
-      <app-icon name="trophy" [size]="18" /> {{ saving() ? 'Guardando…' : 'Guardar premio' }}
+    <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid" [attr.aria-busy]="saving()">
+      @if (saving()) { <app-loader /> } @else { <app-icon name="trophy" [size]="18" /> } {{ saving() ? 'Guardando…' : 'Guardar premio' }}
     </button>
   </form>
 
   <section class="card">
     <h2 class="card-title">Historial</h2>
-    @if (loading()) {
-      <p class="muted">Cargando…</p>
-    } @else {
+    @if (skeleton()) {
+      <div aria-busy="true"><span class="sr-only" role="status">Cargando…</span>
+        @for (i of [0, 1, 2]; track i) {
+          <div class="sk-row sk-divider"><app-skeleton-combo /><span class="sk-push"></span><app-skeleton w="4.5rem" h="1.1rem" /></div>
+        }
+      </div>
+    } @else if (!loading()) {
       @for (p of prizes(); track p.id) {
         <div class="prize-row">
           <div class="prize-info">

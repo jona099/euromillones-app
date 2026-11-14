@@ -95,8 +95,8 @@
       @if (error()) {
         <p class="error" role="alert">{{ error() }}</p>
       }
-      <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid">
-        <app-icon name="check" [size]="18" />
+      <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid" [attr.aria-busy]="saving()">
+        @if (saving()) { <app-loader /> } @else { <app-icon name="check" [size]="18" /> }
         {{ saving() ? 'Guardando…' : editing() ? 'Guardar cambios' : 'Guardar jugada' }}
       </button>
     </footer>
@@ -108,7 +108,7 @@
       <h2 class="card-title">
         <span>Boletos de la semana</span>
         <label class="pill upload" [class.busy]="uploading()">
-          <app-icon name="camera" [size]="16" /> {{ uploading() ? 'Subiendo…' : 'Añadir foto' }}
+          @if (uploading()) { <app-loader size="0.38rem" /> } @else { <app-icon name="camera" [size]="16" /> } {{ uploading() ? 'Subiendo…' : 'Añadir foto' }}
           <input type="file" accept="image/*" capture="environment" multiple hidden
                  [disabled]="uploading()" (change)="onFiles($any($event.target))" />
         </label>
@@ -126,9 +126,18 @@
       }
     </div>
 
-    @if (loading()) {
-      <p class="muted">Cargando…</p>
-    } @else {
+    @if (skeleton()) {
+      <div class="sk-stack" aria-busy="true"><span class="sr-only" role="status">Cargando…</span>
+        @for (d of [0, 1]; track d) {
+          <div class="card">
+            <div class="card-title"><app-skeleton w="11rem" h="1rem" /><app-skeleton w="4.5rem" h="1.4rem" /></div>
+            @for (i of [0, 1]; track i) {
+          <div class="sk-row sk-divider"><app-skeleton-combo /><span class="sk-push"></span><app-skeleton variant="circle" w="26px" /><app-skeleton variant="circle" w="2rem" /></div>
+        }
+          </div>
+        }
+      </div>
+    } @else if (!loading()) {
       @for (d of drawDates(); track d) {
         <div class="card draw-block">
           <h2 class="card-title">

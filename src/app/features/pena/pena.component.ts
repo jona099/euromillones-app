@@ -9,9 +9,13 @@ import { AvatarComponent } from '../../shared/brand/avatar.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { Profile } from '../../core/models';
 
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { LoaderComponent } from '../../shared/loader/loader.component';
+import { delayedLoading } from '../../shared/skeleton/delayed-loading';
+
 @Component({
   selector: 'app-pena',
-  imports: [ReactiveFormsModule, CurrencyPipe, DatePipe, PercentPipe, AvatarComponent, IconComponent],
+  imports: [SkeletonComponent, LoaderComponent, ReactiveFormsModule, CurrencyPipe, DatePipe, PercentPipe, AvatarComponent, IconComponent],
   templateUrl: './pena.component.html',
   styleUrl: './pena.component.scss',
 })
@@ -21,6 +25,8 @@ export class PenaComponent implements OnInit {
 
   protected readonly data = signal<PenaData | null>(null);
   protected readonly loading = signal(true);
+  /** Skeleton sin parpadeo: aparece tras 150 ms y dura al menos 300 ms. */
+  protected readonly skeleton = delayedLoading(this.loading);
   protected readonly saving = signal(false);
   protected readonly showForm = signal(false);
 

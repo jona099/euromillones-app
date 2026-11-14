@@ -1,3 +1,60 @@
+@if (skeleton()) {
+<div class="sk-stack" aria-busy="true">
+  <span class="sr-only" role="status">Cargando…</span>
+  <section class="hero pattern-night">
+    <div class="turn">
+      <app-skeleton w="14rem" h="1.6rem" />
+      <div class="who">
+        <app-skeleton variant="circle" w="52px" />
+        <div class="sk-col"><app-skeleton w="9rem" h="0.8rem" /><app-skeleton w="12rem" h="2rem" r="0.5rem" /></div>
+      </div>
+      <div class="sk-row">
+        @for (i of [0, 1, 2]; track i) { <app-skeleton variant="block" w="4.2rem" h="3.6rem" r="0.8rem" /> }
+      </div>
+      <app-skeleton w="15rem" h="3rem" r="999px" class="sk-mt-lg" />
+    </div>
+    <div class="balance">
+      <app-skeleton w="8rem" h="0.8rem" />
+      <app-skeleton w="11rem" h="2.6rem" r="0.6rem" class="sk-mt" />
+      <app-skeleton w="7rem" h="0.8rem" class="sk-mt" />
+      <app-skeleton h="0.5rem" class="sk-mt-lg" />
+    </div>
+  </section>
+  <section class="kpis">
+    @for (i of [0, 1, 2, 3]; track i) {
+      <article class="card kpi">
+        <app-skeleton variant="block" w="2.5rem" h="2.5rem" r="0.75rem" />
+        <app-skeleton w="4.5rem" h="0.75rem" class="sk-mt" />
+        <app-skeleton w="6.5rem" h="1.5rem" r="0.4rem" class="sk-mt-sm" />
+      </article>
+    }
+  </section>
+  <section class="card">
+    <div class="card-title"><app-skeleton w="10rem" h="1rem" /><app-skeleton w="9rem" h="0.75rem" /></div>
+    <app-skeleton variant="block" h="clamp(10rem, 28vw, 17rem)" />
+  </section>
+  <div class="two">
+    <section class="card">
+      <app-skeleton w="6rem" h="1rem" />
+      @for (i of [0, 1, 2]; track i) {
+        <div class="sk-row sk-divider">
+          <app-skeleton variant="circle" w="40px" />
+          <div class="sk-col"><app-skeleton w="60%" /><app-skeleton h="0.45rem" /><app-skeleton w="80%" h="0.7rem" /></div>
+        </div>
+      }
+    </section>
+    <section class="card">
+      <app-skeleton w="9rem" h="1rem" />
+      @for (i of [0, 1, 2, 3]; track i) {
+        <div class="sk-row sk-divider">
+          <div class="sk-col"><app-skeleton w="55%" /><app-skeleton w="40%" h="0.7rem" /></div>
+          <app-skeleton w="4.5rem" h="1rem" />
+        </div>
+      }
+    </section>
+  </div>
+</div>
+} @else if (!loading()) {
 <!-- ============ HERO: turno + próximo sorteo + balance ============ -->
 <section class="hero pattern-night">
   <div class="turn">
@@ -38,9 +95,7 @@
   </div>
 </section>
 
-@if (loading()) {
-  <p class="muted">Cargando…</p>
-} @else if (!active().length) {
+@if (!active().length) {
   <div class="card empty">
     <h2 class="card-title">Todavía no hay jugadas</h2>
     <p class="muted">Cuando apuntéis las primeras jugadas aparecerán aquí las cuentas, el gráfico y el reparto por turnos.</p>
@@ -158,4 +213,5 @@
       </ul>
     </section>
   </div>
+}
 }

@@ -53,9 +53,18 @@
   </div>
 </section>
 
-@if (loading()) {
-  <p class="muted">Cargando…</p>
-} @else {
+@if (skeleton()) {
+  <div class="sk-stack" aria-busy="true"><span class="sr-only" role="status">Cargando…</span>
+    @for (g of [0, 1, 2]; track g) {
+      <section class="card">
+        <div class="card-title"><app-skeleton w="13rem" h="1rem" /><app-skeleton w="5rem" h="1.4rem" /></div>
+        @for (i of [0, 1]; track i) {
+          <div class="sk-row sk-divider"><app-skeleton-combo /></div>
+        }
+      </section>
+    }
+  </div>
+} @else if (!loading()) {
   @for (g of groups(); track g.date) {
     <section class="card group">
       <h2 class="card-title">

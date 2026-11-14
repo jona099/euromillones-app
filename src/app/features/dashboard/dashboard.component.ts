@@ -13,9 +13,12 @@ interface ChartPoint { x: number; inv: number; won: number; }
 
 const W = 900, H = 280, PAD = { t: 16, r: 16, b: 30, l: 56 };
 
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { delayedLoading } from '../../shared/skeleton/delayed-loading';
+
 @Component({
   selector: 'app-dashboard',
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, PercentPipe, RouterLink, AvatarComponent, IconComponent],
+  imports: [SkeletonComponent, CurrencyPipe, DatePipe, DecimalPipe, PercentPipe, RouterLink, AvatarComponent, IconComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -28,6 +31,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   protected readonly profiles = signal<Profile[]>([]);
   protected readonly week = signal<Week | null>(null);
   protected readonly loading = signal(true);
+  /** Skeleton sin parpadeo: aparece tras 150 ms y dura al menos 300 ms. */
+  protected readonly skeleton = delayedLoading(this.loading);
   private readonly now = signal(new Date());
   private timer?: ReturnType<typeof setInterval>;
 
