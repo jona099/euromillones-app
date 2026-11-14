@@ -12,7 +12,7 @@
 .inner {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   max-width: 1160px;
   margin: 0 auto;
   padding: 0.7rem clamp(1rem, 4vw, 2rem);
@@ -28,7 +28,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.55rem 1rem;
+    padding: 0.5rem 0.85rem;
     border-radius: 999px;
     color: var(--muted);
     font-weight: 700;
@@ -70,8 +70,77 @@
 
 .tabbar { display: none; }
 
+/* ---------- Banner de turno ---------- */
+.banner {
+  background: linear-gradient(90deg, #fff4d1, var(--gold-soft));
+  border-bottom: 1px solid #f3dc8c;
+}
+
+.banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0.7rem clamp(1rem, 4vw, 2rem);
+
+  p { margin: 0; flex: 1; font-size: 0.92rem; strong { color: var(--night); } }
+}
+
+.bell {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex: none;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--night);
+  animation: ring 2.4s ease-in-out 0.6s 2;
+}
+
+@keyframes ring {
+  0%, 20%, 100% { transform: rotate(0); }
+  5%  { transform: rotate(14deg); }
+  10% { transform: rotate(-12deg); }
+  15% { transform: rotate(8deg); }
+}
+
+.banner-cta {
+  flex: none;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: var(--night);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-decoration: none;
+  &:hover { background: var(--night-2); }
+}
+
+.banner-close {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  &:hover { background: rgb(0 0 0 / 0.06); }
+}
+
+@media (max-width: 980px) {
+  .me-name { display: none; }
+}
+
 @media (max-width: 760px) {
   .nav, .me-name { display: none; }
+
+  .banner-inner { flex-wrap: wrap; gap: 0.6rem; p { flex-basis: calc(100% - 5.5rem); } }
+  .banner-cta { margin-left: 2.95rem; }
 
   .content { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
 
@@ -80,7 +149,7 @@
     inset: auto 0 0;
     z-index: 20;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
     background: rgb(255 255 255 / 0.95);
     backdrop-filter: blur(12px);
@@ -93,7 +162,7 @@
       padding: 0.4rem;
       border-radius: 0.8rem;
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-decoration: none;
 

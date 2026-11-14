@@ -115,7 +115,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.timer = setInterval(() => this.now.set(new Date()), 30_000);
     try {
       const [rows, profiles, week] = await Promise.all([
-        this.svc.getWeekly(), this.weekSvc.getProfiles(), this.weekSvc.ensureWeek(),
+        this.svc.getWeekly(), this.weekSvc.getProfiles(), this.weekSvc.ensureWeek(nextDraw()),
       ]);
       this.rows.set(rows);
       this.profiles.set(profiles);

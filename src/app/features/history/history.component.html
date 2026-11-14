@@ -1,0 +1,85 @@
+<header class="head">
+  <h1 class="page-title">Historial</h1>
+  <p class="muted">Todas las jugadas de la peña. Filtra por persona, mes, número o solo las premiadas.</p>
+</header>
+
+<section class="card filters">
+  <div class="people" role="radiogroup" aria-label="Filtrar por turno">
+    <button type="button" class="seg" [class.on]="person() === 'all'" (click)="person.set('all')">Todos</button>
+    @for (p of profiles(); track p.id) {
+      <button type="button" class="seg" [class.on]="person() === p.id" (click)="person.set(p.id)">
+        <app-avatar [name]="p.display_name" [order]="p.turn_order" [size]="22" /> {{ p.display_name }}
+      </button>
+    }
+  </div>
+
+  <div class="row">
+    <label>
+      Mes
+      <select [value]="month()" (change)="month.set($any($event.target).value)">
+        <option value="all">Todos los meses</option>
+        @for (m of months(); track m) {
+          <option [value]="m">{{ monthLabel(m) | date: 'MMMM y' }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Contiene el número
+      <input type="number" min="1" max="50" inputmode="numeric" placeholder="1 – 50"
+             [value]="number() ?? ''" (input)="setNumber($any($event.target).value)" />
+    </label>
+
+    <label class="toggle">
+      <input type="checkbox" [checked]="onlyWon()" (change)="onlyWon.set($any($event.target).checked)" />
+      <span class="switch" aria-hidden="true"></span>
+      Solo premiadas
+    </label>
+
+    @if (hasFilters()) {
+      <button type="button" class="clear" (click)="clear()">Quitar filtros</button>
+    }
+  </div>
+</section>
+
+<section class="summary">
+  <div><span>Jugadas</span><strong>{{ totals().count }}</strong></div>
+  <div><span>Invertido</span><strong>{{ totals().invested | currency: 'EUR' }}</strong></div>
+  <div><span>Ganado</span><strong class="pos">{{ totals().won | currency: 'EUR' }}</strong></div>
+  <div><span>Balance</span>
+    <strong [class.pos]="totals().balance > 0" [class.neg]="totals().balance < 0">
+      {{ totals().balance > 0 ? '+' : '' }}{{ totals().balance | currency: 'EUR' }}
+    </strong>
+  </div>
+</section>
+
+@if (loading()) {
+  <p class="muted">Cargando…</p>
+} @else {
+  @for (g of groups(); track g.date) {
+    <section class="card group">
+      <h2 class="card-title">
+        <span class="date">{{ g.date | date: "EEEE d 'de' MMMM y" }}</span>
+        @if (g.owner; as o) {
+          <span class="owner"><app-avatar [name]="o.display_name" [order]="o.turn_order" [size]="22" /> {{ o.display_name }}</span>
+        }
+      </h2>
+      @for (r of g.rows; track r.play.id) {
+        <div class="line" [class.won]="r.won > 0">
+          <app-combo [numbers]="r.play.numbers" [stars]="r.play.stars" [highlight]="number()" />
+          @if (r.won > 0) {
+            <span class="prize"><app-icon name="trophy" [size]="15" /> +{{ r.won | currency: 'EUR' }}</span>
+          }
+        </div>
+      }
+    </section>
+  } @empty {
+    <div class="card empty">
+      <app-icon name="history" [size]="30" />
+      <p>{{ hasFilters() ? 'Ninguna jugada coincide con estos filtros.' : 'Todavía no hay jugadas registradas.' }}</p>
+      @if (hasFilters()) {
+        <button type="button" class="clear" (click)="clear()">Quitar filtros</button>
+      }
+    </div>
+  }
+}

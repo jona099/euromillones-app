@@ -3,7 +3,7 @@ import { Component, input } from '@angular/core';
 @Component({
   selector: 'app-combo',
   template: `
-    @for (n of numbers(); track n) { <span class="b">{{ n }}</span> }
+    @for (n of numbers(); track n) { <span class="b" [class.hl]="n === highlight()">{{ n }}</span> }
     <span class="sep" aria-hidden="true"></span>
     @for (s of stars(); track s) { <span class="s">{{ s }}</span> }
   `,
@@ -19,6 +19,7 @@ import { Component, input } from '@angular/core';
       background: radial-gradient(circle at 35% 30%, #fff 0 30%, #e7ebf5 75%);
       box-shadow: inset 0 0 0 1.5px #cfd6e6;
     }
+    .b.hl { background: var(--clover); color: #fff; box-shadow: none; }
     .sep { width: 0.15rem; }
     .s {
       background: var(--gold); color: var(--night);
@@ -30,4 +31,5 @@ import { Component, input } from '@angular/core';
 export class ComboComponent {
   readonly numbers = input.required<number[]>();
   readonly stars = input.required<number[]>();
+  readonly highlight = input<number | null>(null);
 }

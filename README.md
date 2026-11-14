@@ -18,6 +18,11 @@ App Angular 19 + Supabase para que Jona, Sergio y Fer registren sus jugadas sema
 
 > La clave `anon` es pública por diseño: los datos los protege RLS + que solo existan 3 usuarios.
 
+### Migraciones
+
+Si ya tenías el esquema inicial, ejecuta también **`supabase/migration_002.sql`** en el SQL Editor
+(favoritas, quién cobra cada premio, pagos entre amigos y fotos de boletos en Storage).
+
 ## 2. Local
 
 ```powershell
@@ -40,3 +45,10 @@ git push -u origin main
 En GitHub: **Settings › Pages › Source: GitHub Actions**. El workflow
 `.github/workflows/deploy.yml` compila y publica en cada push a `main`.
 URL final: `https://TU_USUARIO.github.io/euromillones-app/`
+
+## Instalar en el móvil (PWA)
+
+- **Android / Chrome**: menú ⋮ › *Instalar aplicación*.
+- **iPhone / Safari**: botón compartir › *Añadir a pantalla de inicio*.
+
+El service worker solo se activa en la versión publicada (no en `npm start`).

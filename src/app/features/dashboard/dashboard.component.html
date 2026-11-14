@@ -7,7 +7,7 @@
       <div class="who">
         <app-avatar [name]="r.display_name" [order]="r.turn_order" [size]="52" />
         <div>
-          <p class="who-label">Turno de esta semana</p>
+          <p class="who-label">Turno del próximo sorteo</p>
           <p class="who-name">{{ isMyTurn() ? 'Te toca a ti' : r.display_name }}</p>
         </div>
       </div>

@@ -26,18 +26,22 @@
 </section>
 
 @if (offset() !== 0) {
-  <button type="button" class="back-today" (click)="move(-offset())">Volver a la semana actual</button>
+  <button type="button" class="back-today" (click)="move(-offset())">Volver al próximo sorteo</button>
 }
 
 <div class="layout">
-  <form class="ticket" [formGroup]="form" (ngSubmit)="save()">
+  <form #formEl class="ticket" [class.editing]="editing()" [formGroup]="form" (ngSubmit)="save()">
     <header class="ticket-head">
-      <span>Nuevo boleto</span>
-      <span class="price">2,50 €</span>
+      <span>{{ editing() ? 'Editando jugada' : 'Nuevo boleto' }}</span>
+      @if (editing()) {
+        <button type="button" class="head-btn" (click)="cancelEdit()">Cancelar</button>
+      } @else {
+        <span class="price">2,50 €</span>
+      }
     </header>
 
     <div class="ticket-body">
-      @if (!isMyTurn()) {
+      @if (!isMyTurn() && !editing()) {
         <p class="note">Esta semana le toca a {{ responsibleName() }}, pero puedes apuntar la jugada por él.</p>
       }
 
@@ -50,8 +54,41 @@
         }
       </div>
 
+      @if (favorites().length) {
+        <div class="favs">
+          <span class="favs-label"><app-icon name="star" [size]="15" /> Favoritas</span>
+          <div class="favs-list">
+            @for (f of favorites(); track f.id) {
+              <div class="fav">
+                <button type="button" class="fav-use" (click)="useFavorite(f)" [title]="f.numbers.join(' · ') + ' + ' + f.stars.join(' · ')">
+                  {{ f.name }}
+                </button>
+                <button type="button" class="fav-del" (click)="removeFavorite(f, $event)" [attr.aria-label]="'Quitar ' + f.name">
+                  <app-icon name="x" [size]="12" />
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <app-number-picker formControlName="numbers" label="Elige 5 números" [max]="50" [pick]="5" />
       <app-number-picker formControlName="stars" label="Elige 2 estrellas" [max]="12" [pick]="2" variant="star" />
+
+      @if (form.controls.numbers.valid && form.controls.stars.valid) {
+        @if (namingFavorite()) {
+          <div class="fav-new">
+            <input type="text" [formControl]="favName" placeholder="Nombre, p. ej. «Cumpleaños»" maxlength="30"
+                   (keydown.enter)="$event.preventDefault(); saveFavorite()" />
+            <button type="button" class="pill" (click)="saveFavorite()" [disabled]="favName.invalid">Guardar</button>
+            <button type="button" class="pill ghost" (click)="namingFavorite.set(false)">Cancelar</button>
+          </div>
+        } @else {
+          <button type="button" class="pill star-btn" (click)="namingFavorite.set(true)">
+            <app-icon name="star" [size]="15" /> Guardar como favorita
+          </button>
+        }
+      }
     </div>
 
     <footer class="ticket-foot">
@@ -59,12 +96,36 @@
         <p class="error" role="alert">{{ error() }}</p>
       }
       <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid">
-        <app-icon name="check" [size]="18" /> {{ saving() ? 'Guardando…' : 'Guardar jugada' }}
+        <app-icon name="check" [size]="18" />
+        {{ saving() ? 'Guardando…' : editing() ? 'Guardar cambios' : 'Guardar jugada' }}
       </button>
     </footer>
   </form>
 
   <section class="list">
+    <!-- Fotos del boleto -->
+    <div class="card photos">
+      <h2 class="card-title">
+        <span>Boletos de la semana</span>
+        <label class="pill upload" [class.busy]="uploading()">
+          <app-icon name="camera" [size]="16" /> {{ uploading() ? 'Subiendo…' : 'Añadir foto' }}
+          <input type="file" accept="image/*" capture="environment" multiple hidden
+                 [disabled]="uploading()" (change)="onFiles($any($event.target))" />
+        </label>
+      </h2>
+      @if (photos().length) {
+        <div class="thumbs">
+          @for (p of photos(); track p.id) {
+            <button type="button" class="thumb" (click)="preview.set(p)" aria-label="Ver foto del boleto">
+              <img [src]="p.url" alt="Foto del boleto" loading="lazy" />
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="muted empty">Sube una foto del resguardo para tenerlo siempre a mano.</p>
+      }
+    </div>
+
     @if (loading()) {
       <p class="muted">Cargando…</p>
     } @else {
@@ -75,7 +136,7 @@
             <span class="chip">{{ playsOn(d).length }} {{ playsOn(d).length === 1 ? 'jugada' : 'jugadas' }}</span>
           </h2>
           @for (p of playsOn(d); track p.id) {
-            <div class="play" [class.won]="prizeByPlay().has(p.id)">
+            <div class="play" [class.won]="prizeByPlay().has(p.id)" [class.is-editing]="editing()?.id === p.id">
               <app-combo [numbers]="p.numbers" [stars]="p.stars" />
               <div class="play-meta">
                 @if (prizeByPlay().get(p.id); as amount) {
@@ -84,6 +145,9 @@
                 @if (profileOf(p.created_by); as by) {
                   <app-avatar [name]="by.display_name" [order]="by.turn_order" [size]="26" [attr.title]="'Apuntada por ' + by.display_name" />
                 }
+                <button type="button" class="icon-btn edit" (click)="edit(p)" aria-label="Editar jugada">
+                  <app-icon name="edit" [size]="16" />
+                </button>
                 <button type="button" class="icon-btn" (click)="remove(p)" aria-label="Eliminar jugada">
                   <app-icon name="x" [size]="16" />
                 </button>
@@ -97,3 +161,14 @@
     }
   </section>
 </div>
+
+@if (preview(); as p) {
+  <div class="lightbox" (click)="preview.set(null)" role="dialog" aria-label="Foto del boleto">
+    <img [src]="p.url" alt="Foto del boleto" (click)="$event.stopPropagation()" />
+    <div class="lightbox-actions" (click)="$event.stopPropagation()">
+      <a class="pill" [href]="p.url" target="_blank" rel="noopener">Abrir original</a>
+      <button type="button" class="pill danger" (click)="removePhoto(p)">Eliminar</button>
+      <button type="button" class="pill ghost" (click)="preview.set(null)">Cerrar</button>
+    </div>
+  </div>
+}

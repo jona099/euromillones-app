@@ -28,6 +28,16 @@ export const routes: Routes = [
         title: 'Premios',
         loadComponent: () => import('./features/prizes/prizes.component').then(m => m.PrizesComponent),
       },
+      {
+        path: 'historial',
+        title: 'Historial',
+        loadComponent: () => import('./features/history/history.component').then(m => m.HistoryComponent),
+      },
+      {
+        path: 'pena',
+        title: 'La peña',
+        loadComponent: () => import('./features/pena/pena.component').then(m => m.PenaComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

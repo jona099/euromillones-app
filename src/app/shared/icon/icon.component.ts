@@ -14,6 +14,14 @@ const PATHS: Record<string, string> = {
   right: 'M9 5l7 7-7 7',
   shuffle: 'M4 7h3c5 0 5 10 10 10h3M4 17h3c1.8 0 3-1.3 4-3M13 10c1-1.7 2.2-3 4-3h3M17 4l3 3-3 3M17 14l3 3-3 3',
   check: 'M5 12l5 5L20 7',
+  star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
+  edit: 'M4 20h4L19 9l-4-4L4 16zM14 6l4 4',
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  history: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2',
+  users: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 3.1a4 4 0 0 1 0 7.8M22 21v-1a6 6 0 0 0-4-5.6',
+  bell: 'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
+  plus: 'M12 5v14M5 12h14',
 };
 
 @Component({

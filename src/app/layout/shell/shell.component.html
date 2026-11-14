@@ -24,6 +24,22 @@
   </div>
 </header>
 
+@if (showBanner()) {
+  <div class="banner" role="status">
+    <div class="banner-inner">
+      <span class="bell"><app-icon name="bell" [size]="18" /></span>
+      <p>
+        <strong>Te toca jugar a ti.</strong>
+        Aún no hay jugadas para el sorteo del {{ draw() | date: "EEEE d 'a las' HH:mm" }}.
+      </p>
+      <a class="banner-cta" routerLink="/jugadas">Apuntar jugadas</a>
+      <button type="button" class="banner-close" (click)="dismiss()" aria-label="Ocultar aviso hasta mañana">
+        <app-icon name="x" [size]="16" />
+      </button>
+    </div>
+  </div>
+}
+
 <main class="content">
   <router-outlet />
 </main>

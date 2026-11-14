@@ -1,0 +1,162 @@
+<header class="head">
+  <h1 class="page-title">La peña</h1>
+  <p class="muted">Cuentas claras, quién tiene más suerte y los números que más jugáis.</p>
+</header>
+
+@if (loading()) {
+  <p class="muted">Cargando…</p>
+} @else {
+  <!-- ===================== CUENTAS ===================== -->
+  <section class="card">
+    <h2 class="card-title">
+      <span>Cuentas</span>
+      <button type="button" class="pill" (click)="showForm.set(!showForm())">
+        <app-icon name="plus" [size]="15" /> Apuntar pago
+      </button>
+    </h2>
+    <p class="muted explain">
+      Cada uno pone ⅓ de lo jugado y se lleva ⅓ de lo ganado. Quien tiene el turno adelanta los boletos
+      y quien cobra un premio se queda el dinero; aquí se ve cómo queda cada uno.
+    </p>
+
+    <div class="balances">
+      @for (b of balances(); track b.profile.id) {
+        <article class="balance" [class.owed]="b.net > 0.009" [class.owes]="b.net < -0.009">
+          <div class="balance-top">
+            <app-avatar [name]="b.profile.display_name" [order]="b.profile.turn_order" [size]="38" />
+            <div>
+              <strong>{{ b.profile.display_name }}</strong>
+              <span class="state">
+                @if (b.net > 0.009) { Le deben } @else if (b.net < -0.009) { Debe } @else { En paz }
+              </span>
+            </div>
+          </div>
+          <p class="net">{{ (b.net < 0 ? -b.net : b.net) | currency: 'EUR' }}</p>
+          <dl>
+            <div><dt>Adelantado</dt><dd>{{ b.paid | currency: 'EUR' }}</dd></div>
+            <div><dt>Premios cobrados</dt><dd>{{ b.held | currency: 'EUR' }}</dd></div>
+            <div><dt>Pagos hechos / recibidos</dt><dd>{{ b.sent | currency: 'EUR' }} / {{ b.received | currency: 'EUR' }}</dd></div>
+          </dl>
+        </article>
+      }
+    </div>
+
+    @if (settlements().length) {
+      <div class="settle">
+        <h3>Para quedar en paz</h3>
+        @for (s of settlements(); track s.from.id + s.to.id) {
+          <div class="settle-row">
+            <app-avatar [name]="s.from.display_name" [order]="s.from.turn_order" [size]="28" />
+            <span class="settle-text"><strong>{{ s.from.display_name }}</strong> paga <strong>{{ s.amount | currency: 'EUR' }}</strong> a <strong>{{ s.to.display_name }}</strong></span>
+            <app-icon name="arrow" [size]="16" />
+            <app-avatar [name]="s.to.display_name" [order]="s.to.turn_order" [size]="28" />
+            <button type="button" class="pill ok" (click)="markPaid(s)"><app-icon name="check" [size]="14" /> Hecho</button>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="even"><app-icon name="check" [size]="16" /> Estáis en paz, nadie debe nada.</p>
+    }
+
+    @if (showForm()) {
+      <form class="transfer-form" [formGroup]="form" (ngSubmit)="saveTransfer()">
+        <label>Paga
+          <select formControlName="from_id">
+            <option [ngValue]="null" disabled>Elige</option>
+            @for (p of profiles(); track p.id) { <option [ngValue]="p.id">{{ p.display_name }}</option> }
+          </select>
+        </label>
+        <label>A
+          <select formControlName="to_id">
+            <option [ngValue]="null" disabled>Elige</option>
+            @for (p of profiles(); track p.id) { <option [ngValue]="p.id">{{ p.display_name }}</option> }
+          </select>
+        </label>
+        <label>Importe (€)
+          <input type="number" step="0.01" min="0" inputmode="decimal" formControlName="amount" />
+        </label>
+        <label class="wide">Concepto
+          <input type="text" formControlName="note" placeholder="Bizum, efectivo…" maxlength="60" />
+        </label>
+        <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid || form.value.from_id === form.value.to_id">
+          Guardar pago
+        </button>
+      </form>
+    }
+
+    @if (transfers().length) {
+      <details class="transfers">
+        <summary>Pagos registrados ({{ transfers().length }})</summary>
+        @for (t of transfers(); track t.id) {
+          <div class="t-row">
+            <span>{{ t.paid_on | date: 'd MMM' }}</span>
+            <span class="t-text">{{ nameOf(t.from_id)?.display_name }} → {{ nameOf(t.to_id)?.display_name }}
+              @if (t.note) { <em>· {{ t.note }}</em> }</span>
+            <strong>{{ t.amount | currency: 'EUR' }}</strong>
+            <button type="button" class="icon-btn" (click)="removeTransfer(t.id)" aria-label="Eliminar pago">
+              <app-icon name="x" [size]="14" />
+            </button>
+          </div>
+        }
+      </details>
+    }
+  </section>
+
+  <div class="two">
+    <!-- ===================== RANKING ===================== -->
+    <section class="card">
+      <h2 class="card-title">Ranking de la suerte</h2>
+      <ol class="ranking">
+        @for (r of ranking(); track r.profile.id; let i = $index) {
+          <li [class.first]="i === 0 && r.won > 0">
+            <span class="medal">{{ r.won > 0 ? medals[i] : '·' }}</span>
+            <app-avatar [name]="r.profile.display_name" [order]="r.profile.turn_order" [size]="40" />
+            <div class="r-info">
+              <strong>{{ r.profile.display_name }}</strong>
+              <span class="muted">{{ r.winningTurns }} de {{ r.turns }} turnos con premio · {{ r.hitRate | percent: '1.0-0' }}</span>
+              <div class="bar"><span [style.width.%]="r.hitRate * 100"></span></div>
+            </div>
+            <div class="r-num">
+              <strong class="pos">{{ r.won | currency: 'EUR' }}</strong>
+              <span class="muted">mejor: {{ r.best | currency: 'EUR' }}</span>
+            </div>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- ===================== NÚMEROS ===================== -->
+    <section class="card">
+      <h2 class="card-title">Números más jugados</h2>
+      <div class="heat" role="img" aria-label="Mapa de calor de los números jugados por la peña">
+        @for (n of range50; track n) {
+          <span class="cell" [style.--h]="heat(freq().numbers[n], maxNum())" [class.zero]="!freq().numbers[n]" [class.strong]="heat(freq().numbers[n], maxNum()) > 0.55"
+                [title]="n + ': ' + freq().numbers[n] + ' veces'">{{ n }}</span>
+        }
+      </div>
+      <div class="heat stars">
+        @for (s of range12; track s) {
+          <span class="cell star" [style.--h]="heat(freq().stars[s], maxStar())" [class.zero]="!freq().stars[s]"
+                [title]="'Estrella ' + s + ': ' + freq().stars[s] + ' veces'">{{ s }}</span>
+        }
+      </div>
+
+      <div class="facts">
+        <div>
+          <h3>Los fijos</h3>
+          <p>
+            @for (h of hot(); track h.n) { <span class="tag hot">{{ h.n }} <small>×{{ h.c }}</small></span> }
+            @empty { <span class="muted">Aún no hay datos.</span> }
+          </p>
+        </div>
+        <div>
+          <h3>Nunca jugados ({{ never().length }})</h3>
+          <p>
+            @for (n of never(); track n) { <span class="tag">{{ n }}</span> }
+            @empty { <span class="muted">¡Los habéis jugado todos!</span> }
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+}

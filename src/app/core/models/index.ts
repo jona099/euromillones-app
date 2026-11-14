@@ -26,6 +26,7 @@ export interface Prize {
   play_id: number;
   category: string | null;
   amount: number;
+  collected_by: string | null;
   created_at: string;
 }
 
@@ -37,4 +38,29 @@ export interface WeeklyBalance {
   invested: number;
   won: number;
   balance: number;
+}
+
+export interface Favorite {
+  id: number;
+  name: string;
+  numbers: number[];
+  stars: number[];
+  created_by: string;
+}
+
+export interface Transfer {
+  id: number;
+  from_id: string;
+  to_id: string;
+  amount: number;
+  note: string | null;
+  paid_on: string;
+}
+
+export interface TicketPhoto {
+  id: number;
+  week_id: number;
+  path: string;
+  created_at: string;
+  url?: string;
 }

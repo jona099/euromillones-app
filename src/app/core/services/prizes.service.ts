@@ -10,6 +10,7 @@ export interface NewPrize {
   play_id: number;
   category: string | null;
   amount: number;
+  collected_by: string | null;
 }
 
 /** Categorías oficiales de Euromillones (aciertos números + estrellas). */

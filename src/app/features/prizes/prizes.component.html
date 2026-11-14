@@ -55,6 +55,16 @@
       </label>
     </div>
 
+    <label>
+      ¿Quién lo ha cobrado?
+      <select formControlName="collected_by">
+        <option [ngValue]="null">El del turno de esa semana</option>
+        @for (p of profiles(); track p.id) {
+          <option [ngValue]="p.id">{{ p.display_name }}</option>
+        }
+      </select>
+    </label>
+
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
@@ -76,6 +86,7 @@
             <p class="meta">
               {{ p.play.draw_date | date: 'd MMM y' }}
               @if (p.category) { <span class="chip">{{ p.category }}</span> }
+              @if (p.collected_by) { <span>· cobró {{ nameOf(p.collected_by) }}</span> }
             </p>
           </div>
           <strong class="amount">+{{ p.amount | currency: 'EUR' }}</strong>

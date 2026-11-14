@@ -65,6 +65,7 @@
 
 /* ---------- Boleto ---------- */
 .ticket {
+  scroll-margin-top: 5.5rem;
   position: relative;
   background: var(--surface);
   border-radius: var(--radius);
@@ -192,3 +193,136 @@
   .week-info app-avatar { display: none; }
   .play { flex-wrap: wrap; }
 }
+
+/* ---------- Edición ---------- */
+.ticket.editing .ticket-head { background: linear-gradient(100deg, #b98500, var(--gold)); color: var(--night); }
+
+.head-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  background: rgb(255 255 255 / 0.5);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--night);
+  cursor: pointer;
+}
+
+.play.is-editing { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: var(--radius-sm); }
+.icon-btn.edit:hover { background: var(--surface-alt); color: var(--night); }
+
+/* ---------- Píldoras ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--night);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) { border-color: var(--clover); color: var(--clover-dark); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &.ghost { border-color: transparent; background: transparent; }
+  &.danger { color: var(--red); &:hover { border-color: var(--red); color: var(--red); } }
+}
+
+/* ---------- Favoritas ---------- */
+.favs { display: grid; gap: 0.5rem; }
+.favs-label { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 800; font-size: 0.85rem; color: #b98500; }
+.favs-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.fav {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid #f3dc8c;
+}
+
+.fav-use {
+  padding: 0.35rem 0.4rem 0.35rem 0.8rem;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--night);
+  cursor: pointer;
+}
+
+.fav-del {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  &:hover { background: rgb(0 0 0 / 0.06); color: var(--red); }
+}
+
+.fav-new {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  input { flex: 1; min-width: 0; padding: 0.5rem 0.75rem; }
+}
+
+.star-btn { justify-self: start; }
+
+/* ---------- Fotos ---------- */
+.photos .card-title { margin-bottom: 0.75rem; }
+
+.upload {
+  position: relative;
+  border-color: var(--clover);
+  color: var(--clover-dark);
+  &.busy { opacity: 0.6; pointer-events: none; }
+}
+
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.thumb {
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-alt);
+  cursor: zoom-in;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgb(8 14 34 / 0.88);
+  backdrop-filter: blur(4px);
+
+  img { max-width: min(100%, 900px); max-height: 75dvh; border-radius: var(--radius-sm); box-shadow: 0 20px 50px rgb(0 0 0 / 0.5); }
+}
+
+.lightbox-actions { display: flex; gap: 0.5rem; .pill.ghost { color: #fff; } }

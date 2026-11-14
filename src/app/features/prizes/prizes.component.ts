@@ -3,9 +3,10 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PRIZE_CATEGORIES, PrizeWithPlay, PrizesService } from '../../core/services/prizes.service';
 import { PlaysService } from '../../core/services/plays.service';
+import { WeekService } from '../../core/services/week.service';
 import { ComboComponent } from '../../shared/combo/combo.component';
 import { IconComponent } from '../../shared/icon/icon.component';
-import { Play } from '../../core/models';
+import { Play, Profile } from '../../core/models';
 
 @Component({
   selector: 'app-prizes',
@@ -16,11 +17,13 @@ import { Play } from '../../core/models';
 export class PrizesComponent implements OnInit {
   private readonly prizesSvc = inject(PrizesService);
   private readonly playsSvc = inject(PlaysService);
+  private readonly weekSvc = inject(WeekService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly categories = PRIZE_CATEGORIES;
   protected readonly prizes = signal<PrizeWithPlay[]>([]);
   protected readonly plays = signal<Play[]>([]);
+  protected readonly profiles = signal<Profile[]>([]);
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -35,13 +38,17 @@ export class PrizesComponent implements OnInit {
     play_id: this.fb.control<number | null>(null, Validators.required),
     category: this.fb.control<string | null>(null),
     amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    collected_by: this.fb.control<string | null>(null),
   });
 
   async ngOnInit(): Promise<void> {
     try {
-      const [prizes, plays] = await Promise.all([this.prizesSvc.getAll(), this.playsSvc.getRecent()]);
+      const [prizes, plays, profiles] = await Promise.all([
+        this.prizesSvc.getAll(), this.playsSvc.getRecent(), this.weekSvc.getProfiles(),
+      ]);
       this.prizes.set(prizes);
       this.plays.set(plays);
+      this.profiles.set(profiles);
     } finally {
       this.loading.set(false);
     }
@@ -56,11 +63,11 @@ export class PrizesComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const { play_id, category, amount } = this.form.getRawValue();
+    const { play_id, category, amount, collected_by } = this.form.getRawValue();
     this.saving.set(true);
     this.error.set(null);
     try {
-      await this.prizesSvc.create({ play_id: play_id!, category, amount: amount! });
+      await this.prizesSvc.create({ play_id: play_id!, category, amount: amount!, collected_by });
       this.prizes.set(await this.prizesSvc.getAll());
       this.form.reset();
     } catch (e) {
@@ -69,6 +76,10 @@ export class PrizesComponent implements OnInit {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  protected nameOf(id: string | null): string {
+    return this.profiles().find(p => p.id === id)?.display_name ?? '';
   }
 
   async remove(prize: PrizeWithPlay): Promise<void> {

@@ -48,6 +48,17 @@ export class PlaysService {
     return data as Play;
   }
 
+  async update(id: number, play: Omit<NewPlay, 'week_id'>): Promise<Play> {
+    const payload = {
+      ...play,
+      numbers: [...play.numbers].sort((a, b) => a - b),
+      stars: [...play.stars].sort((a, b) => a - b),
+    };
+    const { data, error } = await this.db.from('plays').update(payload).eq('id', id).select().single();
+    if (error) throw error;
+    return data as Play;
+  }
+
   async delete(id: number): Promise<void> {
     const { error } = await this.db.from('plays').delete().eq('id', id);
     if (error) throw error;
