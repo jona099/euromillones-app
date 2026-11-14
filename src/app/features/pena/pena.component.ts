@@ -13,6 +13,8 @@ import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 
+import { ToastService } from '../../shared/toast/toast.service';
+
 @Component({
   selector: 'app-pena',
   imports: [SkeletonComponent, LoaderComponent, ReactiveFormsModule, CurrencyPipe, DatePipe, PercentPipe, AvatarComponent, IconComponent],
@@ -21,6 +23,7 @@ import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 })
 export class PenaComponent implements OnInit {
   private readonly ledger = inject(LedgerService);
+  private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly data = signal<PenaData | null>(null);
@@ -76,8 +79,22 @@ export class PenaComponent implements OnInit {
   }
 
   async markPaid(s: Settlement): Promise<void> {
-    if (!confirm(`¿Confirmas que ${s.from.display_name} ha pagado ${s.amount.toFixed(2).replace('.', ',')} € a ${s.to.display_name}?`)) return;
-    await this.ledger.addTransfer({ from_id: s.from.id, to_id: s.to.id, amount: s.amount, note: 'Liquidación' });
+    try {
+      const t = await this.ledger.addTransfer({ from_id: s.from.id, to_id: s.to.id, amount: s.amount, note: 'Liquidación' });
+      await this.reload();
+      const amount = s.amount.toFixed(2).replace('.', ',');
+      this.toast.show(`Apuntado: ${s.from.display_name} pagó ${amount} € a ${s.to.display_name}`, {
+        action: { label: 'Deshacer', icon: 'undo', run: () => void this.undoTransfer(t.id) },
+      });
+    } catch (e) {
+      console.error(e);
+      this.toast.error('No se pudo apuntar el pago.');
+    }
+  }
+
+  private async undoTransfer(id: number | undefined): Promise<void> {
+    if (id == null) return;
+    await this.ledger.deleteTransfer(id);
     await this.reload();
   }
 
@@ -93,15 +110,22 @@ export class PenaComponent implements OnInit {
       this.form.reset();
       this.showForm.set(false);
       await this.reload();
+      this.toast.success('Pago guardado');
     } finally {
       this.saving.set(false);
     }
   }
 
-  async removeTransfer(id: number): Promise<void> {
-    if (!confirm('¿Eliminar este pago?')) return;
-    await this.ledger.deleteTransfer(id);
-    await this.reload();
+  removeTransfer(id: number): void {
+    const before = this.data();
+    this.toast.undoable('Pago eliminado', {
+      hide: () => this.data.update(d => (d ? { ...d, transfers: d.transfers.filter(t => t.id !== id) } : d)),
+      restore: () => this.data.set(before),
+      commit: async () => {
+        await this.ledger.deleteTransfer(id);
+        await this.reload();
+      },
+    });
   }
 
   private async reload(): Promise<void> {

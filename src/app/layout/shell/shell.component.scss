@@ -4,7 +4,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgb(255 255 255 / 0.88);
+  background: var(--topbar-bg);
   backdrop-filter: saturate(1.4) blur(12px);
   border-bottom: 1px solid var(--line);
 }
@@ -18,7 +18,7 @@
   padding: 0.7rem clamp(1rem, 4vw, 2rem);
 }
 
-.brand { color: var(--night); text-decoration: none; }
+.brand { color: var(--heading); text-decoration: none; }
 
 .nav {
   display: flex;
@@ -35,8 +35,8 @@
     text-decoration: none;
     transition: background 0.15s, color 0.15s;
 
-    &:hover { color: var(--night); background: var(--surface-alt); }
-    &.active { color: var(--clover-dark); background: var(--clover-soft); }
+    &:hover { color: var(--heading); background: var(--surface-alt); }
+    &.active { color: var(--accent-ink); background: var(--clover-soft); }
   }
 }
 
@@ -72,8 +72,8 @@
 
 /* ---------- Banner de turno ---------- */
 .banner {
-  background: linear-gradient(90deg, #fff4d1, var(--gold-soft));
-  border-bottom: 1px solid #f3dc8c;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--gold) 24%, var(--surface)), var(--gold-soft));
+  border-bottom: 1px solid var(--gold-line);
 }
 
 .banner-inner {
@@ -84,7 +84,7 @@
   margin: 0 auto;
   padding: 0.7rem clamp(1rem, 4vw, 2rem);
 
-  p { margin: 0; flex: 1; font-size: 0.92rem; strong { color: var(--night); } }
+  p { margin: 0; flex: 1; font-size: 0.92rem; strong { color: var(--heading); } }
 }
 
 .bell {
@@ -95,7 +95,7 @@
   flex: none;
   border-radius: 50%;
   background: var(--gold);
-  color: var(--night);
+  color: var(--ball-ink);
   animation: ring 2.4s ease-in-out 0.6s 2;
 }
 
@@ -129,7 +129,7 @@
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  &:hover { background: rgb(0 0 0 / 0.06); }
+  &:hover { background: var(--wash); }
 }
 
 @media (max-width: 980px) {
@@ -151,7 +151,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     padding: 0.4rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
-    background: rgb(255 255 255 / 0.95);
+    background: var(--topbar-bg);
     backdrop-filter: blur(12px);
     border-top: 1px solid var(--line);
 
@@ -166,7 +166,7 @@
       font-weight: 700;
       text-decoration: none;
 
-      &.active { color: var(--clover-dark); }
+      &.active { color: var(--accent-ink); }
     }
   }
 }

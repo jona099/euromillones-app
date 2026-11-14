@@ -22,6 +22,8 @@ import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.com
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 
+import { ToastService } from '../../shared/toast/toast.service';
+
 @Component({
   selector: 'app-plays',
   imports: [SkeletonComponent, SkeletonComboComponent, LoaderComponent, ReactiveFormsModule, NumberPickerComponent, ComboComponent, AvatarComponent, IconComponent, DatePipe, CurrencyPipe],
@@ -30,6 +32,7 @@ import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 })
 export class PlaysComponent implements OnInit {
   private readonly playsSvc = inject(PlaysService);
+  private readonly toast = inject(ToastService);
   private readonly prizesSvc = inject(PrizesService);
   private readonly favSvc = inject(FavoritesService);
   private readonly photoSvc = inject(PhotosService);
@@ -109,9 +112,11 @@ export class PlaysComponent implements OnInit {
       if (editing) {
         const updated = await this.playsSvc.update(editing.id, value);
         this.plays.update(list => list.map(p => (p.id === updated.id ? updated : p)));
+        this.toast.success('Jugada actualizada');
       } else {
         const play = await this.playsSvc.create({ week_id: w.id, ...value });
         this.plays.update(list => [...list, play]);
+        this.toast.success('Jugada guardada');
       }
       this.resetForm();
     } catch (e) {
@@ -133,11 +138,14 @@ export class PlaysComponent implements OnInit {
     this.resetForm();
   }
 
-  async remove(play: Play): Promise<void> {
-    if (!confirm('¿Eliminar esta jugada? Se borrarán también sus premios.')) return;
-    await this.playsSvc.delete(play.id);
-    this.plays.update(list => list.filter(p => p.id !== play.id));
+  remove(play: Play): void {
     if (this.editing()?.id === play.id) this.resetForm();
+    const hasPrize = this.prizeByPlay().has(play.id);
+    this.toast.undoable(hasPrize ? 'Jugada y su premio eliminados' : 'Jugada eliminada', {
+      hide: () => this.plays.update(list => list.filter(p => p.id !== play.id)),
+      restore: () => this.plays.update(list => (list.some(p => p.id === play.id) ? list : [...list, play])),
+      commit: () => this.playsSvc.delete(play.id),
+    });
   }
 
   // ---------------- Favoritas ----------------
@@ -153,13 +161,16 @@ export class PlaysComponent implements OnInit {
     this.favorites.update(list => [...list, fav]);
     this.favName.reset();
     this.namingFavorite.set(false);
+    this.toast.success(`«${fav.name}» guardada en favoritas`);
   }
 
-  async removeFavorite(f: Favorite, ev: Event): Promise<void> {
+  removeFavorite(f: Favorite, ev: Event): void {
     ev.stopPropagation();
-    if (!confirm(`¿Quitar "${f.name}" de favoritas?`)) return;
-    await this.favSvc.delete(f.id);
-    this.favorites.update(list => list.filter(x => x.id !== f.id));
+    this.toast.undoable(`«${f.name}» quitada de favoritas`, {
+      hide: () => this.favorites.update(list => list.filter(x => x.id !== f.id)),
+      restore: () => this.favorites.update(list => (list.some(x => x.id === f.id) ? list : [...list, f])),
+      commit: () => this.favSvc.delete(f.id),
+    });
   }
 
   // ---------------- Fotos del boleto ----------------
@@ -173,6 +184,7 @@ export class PlaysComponent implements OnInit {
     try {
       for (const f of files) await this.photoSvc.upload(w.id, f);
       this.photos.set(await this.photoSvc.getByWeek(w.id));
+      this.toast.success(files.length === 1 ? 'Foto subida' : `${files.length} fotos subidas`);
     } catch (e) {
       this.error.set('No se pudo subir la foto. Prueba con otra imagen.');
       console.error(e);
@@ -181,11 +193,13 @@ export class PlaysComponent implements OnInit {
     }
   }
 
-  async removePhoto(p: TicketPhoto): Promise<void> {
-    if (!confirm('¿Eliminar esta foto del boleto?')) return;
-    await this.photoSvc.delete(p);
-    this.photos.update(list => list.filter(x => x.id !== p.id));
+  removePhoto(p: TicketPhoto): void {
     this.preview.set(null);
+    this.toast.undoable('Foto eliminada', {
+      hide: () => this.photos.update(list => list.filter(x => x.id !== p.id)),
+      restore: () => this.photos.update(list => (list.some(x => x.id === p.id) ? list : [...list, p])),
+      commit: () => this.photoSvc.delete(p),
+    });
   }
 
   // ---------------- Helpers ----------------

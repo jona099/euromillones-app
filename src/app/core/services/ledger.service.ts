@@ -54,9 +54,10 @@ export class LedgerService {
     };
   }
 
-  async addTransfer(t: Pick<Transfer, 'from_id' | 'to_id' | 'amount' | 'note'>): Promise<void> {
-    const { error } = await this.db.from('transfers').insert(t);
+  async addTransfer(t: Pick<Transfer, 'from_id' | 'to_id' | 'amount' | 'note'>): Promise<Transfer> {
+    const { data, error } = await this.db.from('transfers').insert(t).select().single();
     if (error) throw error;
+    return data as Transfer;
   }
 
   async deleteTransfer(id: number): Promise<void> {

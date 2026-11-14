@@ -10,12 +10,13 @@ import { nextDraw } from '../../core/services/draw.util';
 import { LogoComponent } from '../../shared/brand/logo.component';
 import { AvatarComponent } from '../../shared/brand/avatar.component';
 import { IconComponent } from '../../shared/icon/icon.component';
+import { ThemeMenuComponent } from '../../shared/theme-menu/theme-menu.component';
 
 const DISMISS_KEY = 'trebol.banner.dismissed';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LogoComponent, AvatarComponent, IconComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe, LogoComponent, AvatarComponent, IconComponent, ThemeMenuComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })

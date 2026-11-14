@@ -1,22 +1,26 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { ThemeService } from './core/services/theme.service';
+import { AppUpdateService } from './core/services/app-update.service';
+import { ToastHostComponent } from './shared/toast/toast-host.component';
 import {
   NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet,
 } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastHostComponent],
   template: `
     <div class="nav-progress" [class.on]="progress()" [class.done]="done()" aria-hidden="true"></div>
     <router-outlet />
+    <app-toast-host />
   `,
   styles: `
     .nav-progress {
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
       height: 3px; pointer-events: none;
       background: linear-gradient(90deg, var(--clover), var(--gold));
-      box-shadow: 0 0 8px rgb(18 183 106 / 0.6);
+      box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.6);
       transform-origin: 0 50%;
       transform: scaleX(0);
       opacity: 0;
@@ -32,6 +36,8 @@ export class AppComponent {
   protected readonly done = signal(false);
 
   constructor() {
+    inject(ThemeService);              // aplica y vigila el tema desde el arranque
+    inject(AppUpdateService).start();  // aviso de versión nueva de la PWA
     const router = inject(Router);
     let timer: ReturnType<typeof setTimeout> | undefined;
     let first = true;

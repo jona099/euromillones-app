@@ -7,7 +7,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><circle cx='20' cy='11' r='9' fill='%2312b76a'/><circle cx='11' cy='26' r='9' fill='%2312b76a'/><circle cx='29' cy='26' r='9' fill='%2312b76a'/><circle cx='20' cy='22' r='5' fill='%23f5b915'/></svg>" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0c1838" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" />
+  <script>
+    /* Aplica tema y acento antes de pintar para que no haya destello. Mismas claves que ThemeService. */
+    (function () {
+      var mode = 'system', accent = 'trebol';
+      try {
+        mode = localStorage.getItem('trebol.theme') || mode;
+        accent = localStorage.getItem('trebol.accent') || accent;
+      } catch (e) {}
+      var dark = mode === 'dark' || (mode !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var html = document.documentElement;
+      html.setAttribute('data-theme', dark ? 'dark' : 'light');
+      if (/^(trebol|oceano|rubi)$/.test(accent)) html.setAttribute('data-accent', accent);
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#131a2e' : '#ffffff');
+    })();
+  </script>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Trébol" />

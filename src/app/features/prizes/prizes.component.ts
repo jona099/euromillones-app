@@ -13,6 +13,8 @@ import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.com
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 
+import { ToastService } from '../../shared/toast/toast.service';
+
 @Component({
   selector: 'app-prizes',
   imports: [SkeletonComponent, SkeletonComboComponent, LoaderComponent, ReactiveFormsModule, ComboComponent, IconComponent, CurrencyPipe, DatePipe],
@@ -21,6 +23,7 @@ import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 })
 export class PrizesComponent implements OnInit {
   private readonly prizesSvc = inject(PrizesService);
+  private readonly toast = inject(ToastService);
   private readonly playsSvc = inject(PlaysService);
   private readonly weekSvc = inject(WeekService);
   private readonly fb = inject(FormBuilder);
@@ -77,6 +80,7 @@ export class PrizesComponent implements OnInit {
       await this.prizesSvc.create({ play_id: play_id!, category, amount: amount!, collected_by });
       this.prizes.set(await this.prizesSvc.getAll());
       this.form.reset();
+      this.toast.success('Premio apuntado. ¡Enhorabuena!');
     } catch (e) {
       this.error.set('No se pudo guardar el premio. Inténtalo de nuevo.');
       console.error(e);
@@ -89,9 +93,17 @@ export class PrizesComponent implements OnInit {
     return this.profiles().find(p => p.id === id)?.display_name ?? '';
   }
 
-  async remove(prize: PrizeWithPlay): Promise<void> {
-    if (!confirm('¿Eliminar este premio?')) return;
-    await this.prizesSvc.delete(prize.id);
-    this.prizes.update(list => list.filter(p => p.id !== prize.id));
+  remove(prize: PrizeWithPlay): void {
+    const index = this.prizes().findIndex(p => p.id === prize.id);
+    this.toast.undoable('Premio eliminado', {
+      hide: () => this.prizes.update(list => list.filter(p => p.id !== prize.id)),
+      restore: () => this.prizes.update(list => {
+        if (list.some(p => p.id === prize.id)) return list;
+        const copy = [...list];
+        copy.splice(index < 0 ? copy.length : index, 0, prize);
+        return copy;
+      }),
+      commit: () => this.prizesSvc.delete(prize.id),
+    });
   }
 }

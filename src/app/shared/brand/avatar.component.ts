@@ -16,7 +16,7 @@ const COLORS = ['#4f6bff', '#ff7a45', '#12b76a'];
     :host {
       display: inline-grid; place-items: center; flex: none;
       border-radius: 50%; color: #fff; font-weight: 800;
-      box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+      box-shadow: 0 0 0 2px var(--surface);
     }
   `,
 })

@@ -62,14 +62,14 @@
 
 .ball {
   border-radius: 50%;
-  color: var(--night);
+  color: var(--ball-ink);
   background: radial-gradient(circle at 35% 30%, #fff 0 30%, #dfe5f3 80%);
   box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.5);
 }
 
 .star {
   background: var(--gold);
-  color: var(--night);
+  color: var(--ball-ink);
   clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
   padding-top: 0.25rem;
   font-size: 0.85rem;
@@ -93,7 +93,7 @@ form {
   gap: 1.1rem;
   width: min(100%, 23rem);
 
-  h2 { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--night); }
+  h2 { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--heading); }
   .sub { margin: -0.6rem 0 0.5rem; }
 }
 

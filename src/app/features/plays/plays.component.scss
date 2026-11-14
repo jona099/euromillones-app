@@ -49,7 +49,7 @@
   margin-top: -0.5rem;
   border: 0;
   background: none;
-  color: var(--clover-dark);
+  color: var(--accent-ink);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -79,8 +79,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.9rem 1.25rem;
-  background: linear-gradient(100deg, var(--clover-dark), var(--clover));
-  color: #fff;
+  background: linear-gradient(100deg, var(--accent-fill), var(--clover-dark));
+  color: var(--on-accent);
   font-weight: 800;
 
   .price {
@@ -143,7 +143,7 @@
     border: 1.5px solid var(--line);
     font-size: 1.05rem;
     font-weight: 800;
-    color: var(--night);
+    color: var(--heading);
     transition: border-color 0.15s, background 0.15s;
   }
 
@@ -173,13 +173,13 @@
     padding-inline: 0.75rem;
     border-radius: var(--radius-sm);
     border-top-color: transparent;
-    background: linear-gradient(90deg, var(--clover-soft), #f4fcf8);
+    background: linear-gradient(90deg, var(--clover-soft), var(--accent-tint));
     box-shadow: inset 3px 0 0 var(--clover);
   }
 }
 
 .play-meta { display: flex; align-items: center; gap: 0.4rem; }
-.prize { font-weight: 800; color: var(--clover-dark); margin-right: 0.25rem; }
+.prize { font-weight: 800; color: var(--pos-ink); margin-right: 0.25rem; }
 .empty { margin: 0; font-size: 0.9rem; }
 
 @media (max-width: 860px) {
@@ -195,7 +195,7 @@
 }
 
 /* ---------- Edición ---------- */
-.ticket.editing .ticket-head { background: linear-gradient(100deg, #b98500, var(--gold)); color: var(--night); }
+.ticket.editing .ticket-head { background: linear-gradient(100deg, #c99500, var(--gold)); color: var(--ball-ink); }
 
 .head-btn {
   border: 0;
@@ -205,12 +205,12 @@
   font: inherit;
   font-size: 0.85rem;
   font-weight: 800;
-  color: var(--night);
+  color: var(--heading);
   cursor: pointer;
 }
 
 .play.is-editing { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: var(--radius-sm); }
-.icon-btn.edit:hover { background: var(--surface-alt); color: var(--night); }
+.icon-btn.edit:hover { background: var(--surface-alt); color: var(--heading); }
 
 /* ---------- Píldoras ---------- */
 .pill {
@@ -224,12 +224,12 @@
   font: inherit;
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--night);
+  color: var(--heading);
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
 
-  &:hover:not(:disabled) { border-color: var(--clover); color: var(--clover-dark); }
+  &:hover:not(:disabled) { border-color: var(--clover); color: var(--accent-ink); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
   &.ghost { border-color: transparent; background: transparent; }
   &.danger { color: var(--red); &:hover { border-color: var(--red); color: var(--red); } }
@@ -237,7 +237,7 @@
 
 /* ---------- Favoritas ---------- */
 .favs { display: grid; gap: 0.5rem; }
-.favs-label { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 800; font-size: 0.85rem; color: #b98500; }
+.favs-label { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 800; font-size: 0.85rem; color: var(--gold-ink); }
 .favs-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
 .fav {
@@ -245,7 +245,7 @@
   align-items: center;
   border-radius: 999px;
   background: var(--gold-soft);
-  border: 1px solid #f3dc8c;
+  border: 1px solid var(--gold-line);
 }
 
 .fav-use {
@@ -255,7 +255,7 @@
   font: inherit;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--night);
+  color: var(--heading);
   cursor: pointer;
 }
 
@@ -270,7 +270,7 @@
   background: none;
   color: var(--muted);
   cursor: pointer;
-  &:hover { background: rgb(0 0 0 / 0.06); color: var(--red); }
+  &:hover { background: var(--wash); color: var(--red); }
 }
 
 .fav-new {
@@ -288,7 +288,7 @@
 .upload {
   position: relative;
   border-color: var(--clover);
-  color: var(--clover-dark);
+  color: var(--accent-ink);
   &.busy { opacity: 0.6; pointer-events: none; }
 }
 

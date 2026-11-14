@@ -102,8 +102,8 @@
 
 .kpi { position: relative; padding: 1.1rem 1.2rem; }
 .kpi-label { margin: 0.75rem 0 0; font-size: 0.85rem; font-weight: 700; color: var(--muted); }
-.kpi-value { margin: 0.1rem 0 0; font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; color: var(--night); }
-.kpi-value.pos { color: var(--clover-dark); }
+.kpi-value { margin: 0.1rem 0 0; font-size: 1.55rem; font-weight: 800; letter-spacing: -0.03em; color: var(--heading); }
+.kpi-value.pos { color: var(--pos-ink); }
 .kpi-foot { margin: 0.1rem 0 0; font-size: 0.8rem; color: var(--muted); }
 
 .kpi-icon {
@@ -114,9 +114,9 @@
   border-radius: 0.75rem;
 
   &.inv { background: var(--red-soft); color: var(--red); }
-  &.won { background: var(--clover-soft); color: var(--clover-dark); }
-  &.ticket { background: #eaefff; color: #4f6bff; }
-  &.best { background: var(--gold-soft); color: #b98500; }
+  &.won { background: var(--clover-soft); color: var(--accent-ink); }
+  &.ticket { background: var(--blue-soft); color: var(--blue); }
+  &.best { background: var(--gold-soft); color: var(--gold-ink); }
 }
 
 /* ---------------- Gráfico ---------------- */
@@ -128,20 +128,20 @@
   height: 0.6rem;
   border-radius: 50%;
   margin-right: 0.35rem;
-  &.inv { background: var(--red); }
-  &.won { background: var(--clover); }
+  &.inv { background: var(--chart-inv); }
+  &.won { background: var(--chart-won); }
 }
 
 .chart-wrap { overflow-x: auto; }
 svg { display: block; width: 100%; min-width: 560px; height: auto; }
-.grid { stroke: #edf0f6; }
-.axis { font-size: 12px; font-weight: 600; fill: #98a0b5; }
+.grid { stroke: var(--line); }
+.axis { font-size: 12px; font-weight: 600; fill: var(--muted); }
 .line-inv, .line-won { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
-.line-inv { stroke: var(--red); }
-.line-won { stroke: var(--clover); }
-.dot-inv, .dot-won { stroke: #fff; stroke-width: 3; }
-.dot-inv { fill: var(--red); }
-.dot-won { fill: var(--clover); }
+.line-inv { stroke: var(--chart-inv); }
+.line-won { stroke: var(--chart-won); }
+.dot-inv, .dot-won { stroke: var(--surface); stroke-width: 3; }
+.dot-inv { fill: var(--chart-inv); }
+.dot-won { fill: var(--chart-won); }
 
 /* ---------------- Listas ---------------- */
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
@@ -158,7 +158,7 @@ svg { display: block; width: 100%; min-width: 560px; height: auto; }
 
 .person { flex: 1; display: grid; gap: 0.4rem; min-width: 0; }
 .person-top, .person-bottom { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.85rem; }
-.person-top strong { font-size: 0.98rem; color: var(--night); }
+.person-top strong { font-size: 0.98rem; color: var(--heading); }
 .person-bottom { color: var(--muted); font-weight: 600; }
 
 .weeks li {
@@ -170,7 +170,7 @@ svg { display: block; width: 100%; min-width: 560px; height: auto; }
   & + li { border-top: 1px solid var(--line); }
 
   div { display: grid; }
-  strong { color: var(--night); font-size: 0.95rem; }
+  strong { color: var(--heading); font-size: 0.95rem; }
   .muted { font-size: 0.82rem; }
 }
 

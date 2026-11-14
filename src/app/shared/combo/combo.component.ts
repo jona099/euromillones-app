@@ -15,14 +15,14 @@ import { Component, input } from '@angular/core';
       font-weight: 800; font-size: 0.82rem;
     }
     .b {
-      border-radius: 50%; color: var(--night);
-      background: radial-gradient(circle at 35% 30%, #fff 0 30%, #e7ebf5 75%);
-      box-shadow: inset 0 0 0 1.5px #cfd6e6;
+      border-radius: 50%; color: var(--ball-ink);
+      background: radial-gradient(circle at 35% 30%, var(--ball-hi) 0 30%, var(--ball-lo) 75%);
+      box-shadow: inset 0 0 0 1.5px var(--ball-line);
     }
-    .b.hl { background: var(--clover); color: #fff; box-shadow: none; }
+    .b.hl { background: var(--accent-fill); color: var(--on-accent); box-shadow: none; }
     .sep { width: 0.15rem; }
     .s {
-      background: var(--gold); color: var(--night);
+      background: var(--gold); color: var(--ball-ink);
       clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
       padding-top: 0.2rem; font-size: 0.68rem;
     }

@@ -16,6 +16,7 @@
       <div class="me">
         <app-avatar [name]="me.display_name" [order]="me.turn_order" [size]="34" />
         <span class="me-name">{{ me.display_name }}</span>
+        <app-theme-menu />
         <button type="button" class="logout" (click)="auth.logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
           <app-icon name="logout" [size]="18" />
         </button>
