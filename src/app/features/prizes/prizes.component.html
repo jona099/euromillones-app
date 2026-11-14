@@ -1,0 +1,94 @@
+<section class="summary pattern-night">
+  <div class="summary-main">
+    <span class="trophy"><app-icon name="trophy" [size]="26" /></span>
+    <div>
+      <p class="label">Total en premios</p>
+      <p class="value">{{ totalWon() | currency: 'EUR' }}</p>
+    </div>
+  </div>
+  <dl class="summary-stats">
+    <div><dt>Premios</dt><dd>{{ prizes().length }}</dd></div>
+    <div><dt>El más gordo</dt><dd>{{ biggest() | currency: 'EUR' }}</dd></div>
+  </dl>
+</section>
+
+<div class="layout">
+  <form class="card" [formGroup]="form" (ngSubmit)="save()">
+    <h2 class="card-title">Apuntar un premio</h2>
+
+    <fieldset>
+      <legend>¿Qué jugada ha tocado?</legend>
+      @if (plays().length) {
+        <div class="play-list">
+          @for (p of plays(); track p.id) {
+            <button type="button" class="play-opt"
+                    [class.on]="form.controls.play_id.value === p.id"
+                    [attr.aria-pressed]="form.controls.play_id.value === p.id"
+                    (click)="selectPlay(p.id)">
+              <span class="date">{{ p.draw_date | date: 'EEE d MMM' }}</span>
+              <app-combo [numbers]="p.numbers" [stars]="p.stars" />
+              <span class="check"><app-icon name="check" [size]="16" /></span>
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="muted">No hay jugadas en los últimos 90 días. Apúntalas primero en Jugadas.</p>
+      }
+    </fieldset>
+
+    <div class="row">
+      <label>
+        Categoría
+        <select formControlName="category">
+          <option [ngValue]="null">Sin indicar</option>
+          @for (c of categories; track c) {
+            <option [ngValue]="c">{{ c }} aciertos</option>
+          }
+        </select>
+      </label>
+      <label>
+        Importe
+        <span class="money">
+          <input type="number" inputmode="decimal" step="0.01" min="0" formControlName="amount" placeholder="0,00" />
+          <span>€</span>
+        </span>
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid">
+      <app-icon name="trophy" [size]="18" /> {{ saving() ? 'Guardando…' : 'Guardar premio' }}
+    </button>
+  </form>
+
+  <section class="card">
+    <h2 class="card-title">Historial</h2>
+    @if (loading()) {
+      <p class="muted">Cargando…</p>
+    } @else {
+      @for (p of prizes(); track p.id) {
+        <div class="prize-row">
+          <div class="prize-info">
+            <app-combo [numbers]="p.play.numbers" [stars]="p.play.stars" />
+            <p class="meta">
+              {{ p.play.draw_date | date: 'd MMM y' }}
+              @if (p.category) { <span class="chip">{{ p.category }}</span> }
+            </p>
+          </div>
+          <strong class="amount">+{{ p.amount | currency: 'EUR' }}</strong>
+          <button type="button" class="icon-btn" (click)="remove(p)" aria-label="Eliminar premio">
+            <app-icon name="x" [size]="16" />
+          </button>
+        </div>
+      } @empty {
+        <div class="empty">
+          <app-icon name="trophy" [size]="32" />
+          <p>Todavía no ha caído nada.<br />Cuando toque, apúntalo aquí.</p>
+        </div>
+      }
+    }
+  </section>
+</div>

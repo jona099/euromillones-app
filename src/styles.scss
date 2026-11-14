@@ -1,0 +1,148 @@
+/* ================= Trébol · tokens ================= */
+:root {
+  --night: #0c1838;         /* azul noche (marca) */
+  --night-2: #16285a;
+  --clover: #12b76a;        /* verde trébol (acción) */
+  --clover-dark: #0a8f52;
+  --clover-soft: #e6f8ef;
+  --gold: #f5b915;          /* estrellas / premios */
+  --gold-soft: #fff6dc;
+  --red: #e5484d;
+  --red-soft: #fdecec;
+
+  --bg: #f3f5fa;
+  --surface: #ffffff;
+  --line: #e4e8f1;
+  --text: #121a33;
+  --muted: #66708a;
+
+  --ink: var(--night);      /* alias usado por componentes */
+  --green: var(--clover-dark);
+  --surface-alt: #eef1f8;
+
+  --radius: 1rem;
+  --radius-sm: 0.65rem;
+  --shadow: 0 1px 2px rgb(12 24 56 / 0.06), 0 8px 24px -12px rgb(12 24 56 / 0.18);
+
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-feature-settings: 'tnum' 1;        /* cifras tabulares para importes */
+  color: var(--text);
+  background: var(--bg);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { letter-spacing: -0.015em; }
+
+:focus-visible { outline: 3px solid var(--clover); outline-offset: 2px; }
+
+/* ---------- Superficies ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--night);
+}
+
+/* Patrón decorativo de bolas y estrellas para fondos oscuros */
+.pattern-night {
+  background-color: var(--night);
+  background-image:
+    radial-gradient(ellipse 70% 90% at 100% 0%, rgb(18 183 106 / 0.32), transparent),
+    radial-gradient(ellipse 60% 80% at 0% 100%, rgb(79 107 255 / 0.22), transparent),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.045' stroke-width='2'%3E%3Ccircle cx='20' cy='20' r='11'/%3E%3Ccircle cx='80' cy='70' r='11'/%3E%3Cpath d='M80 12l3.5 7.5 8 .9-6 5.4 1.7 7.9-7.2-4.1-7.2 4.1 1.7-7.9-6-5.4 8-.9z'/%3E%3Cpath d='M22 78l3.5 7.5 8 .9-6 5.4 1.7 7.9-7.2-4.1-7.2 4.1 1.7-7.9-6-5.4 8-.9z'/%3E%3C/g%3E%3C/svg%3E");
+  color: #fff;
+}
+
+/* ---------- Formularios ---------- */
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+input, select {
+  font: inherit;
+  font-weight: 500;
+  padding: 0.75rem 0.9rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus { border-color: var(--clover); box-shadow: 0 0 0 4px rgb(18 183 106 / 0.15); outline: none; }
+  &.ng-touched.ng-invalid { border-color: var(--red); }
+}
+
+/* ---------- Botones ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font: inherit;
+  font-weight: 800;
+  padding: 0.85rem 1.3rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--clover);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -6px rgb(18 183 106 / 0.6);
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover:not(:disabled) { background: var(--clover-dark); }
+  &:active:not(:disabled) { transform: translateY(1px); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+
+  &:hover { background: var(--red-soft); color: var(--red); }
+}
+
+/* ---------- Varios ---------- */
+.page-title { margin: 0; font-size: 1.75rem; font-weight: 800; color: var(--night); }
+.muted { color: var(--muted); }
+.pos { color: var(--clover-dark); }
+.neg { color: var(--red); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--surface-alt);
+  color: var(--night);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

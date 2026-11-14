@@ -1,0 +1,161 @@
+<!-- ============ HERO: turno + próximo sorteo + balance ============ -->
+<section class="hero pattern-night">
+  <div class="turn">
+    <span class="eyebrow-chip"><app-icon name="clock" [size]="14" /> Próximo sorteo · {{ draw() | date: "EEEE d 'a las' HH:mm" }}</span>
+
+    @if (responsible(); as r) {
+      <div class="who">
+        <app-avatar [name]="r.display_name" [order]="r.turn_order" [size]="52" />
+        <div>
+          <p class="who-label">Turno de esta semana</p>
+          <p class="who-name">{{ isMyTurn() ? 'Te toca a ti' : r.display_name }}</p>
+        </div>
+      </div>
+    }
+
+    <div class="countdown" aria-label="Tiempo hasta el próximo sorteo">
+      <div><strong>{{ left().d }}</strong><span>días</span></div>
+      <div><strong>{{ left().h | number: '2.0-0' }}</strong><span>horas</span></div>
+      <div><strong>{{ left().m | number: '2.0-0' }}</strong><span>min</span></div>
+    </div>
+
+    <a class="btn-primary hero-cta" routerLink="/jugadas">
+      <app-icon name="ticket" [size]="18" /> {{ isMyTurn() ? 'Apuntar mis jugadas' : 'Ver jugadas de la semana' }}
+    </a>
+  </div>
+
+  <div class="balance">
+    <p class="balance-label">Balance de la peña</p>
+    <p class="balance-value" [class.up]="balance() >= 0">
+      {{ balance() >= 0 ? '+' : '' }}{{ balance() | currency: 'EUR' }}
+    </p>
+    <p class="balance-sub">{{ perHead() >= 0 ? '+' : '' }}{{ perHead() | currency: 'EUR' }} por cabeza</p>
+
+    <div class="recovery">
+      <div class="bar"><span [style.width.%]="(recovered() > 1 ? 1 : recovered()) * 100"></span></div>
+      <p>Recuperado el {{ recovered() | percent: '1.0-0' }} de lo invertido</p>
+    </div>
+  </div>
+</section>
+
+@if (loading()) {
+  <p class="muted">Cargando…</p>
+} @else if (!active().length) {
+  <div class="card empty">
+    <h2 class="card-title">Todavía no hay jugadas</h2>
+    <p class="muted">Cuando apuntéis las primeras jugadas aparecerán aquí las cuentas, el gráfico y el reparto por turnos.</p>
+  </div>
+} @else {
+  <!-- ============ KPIs ============ -->
+  <section class="kpis">
+    <article class="card kpi">
+      <span class="kpi-icon inv"><app-icon name="wallet" /></span>
+      <p class="kpi-label">Invertido</p>
+      <p class="kpi-value">{{ invested() | currency: 'EUR' }}</p>
+    </article>
+    <article class="card kpi">
+      <span class="kpi-icon won"><app-icon name="coins" /></span>
+      <p class="kpi-label">Ganado</p>
+      <p class="kpi-value pos">{{ won() | currency: 'EUR' }}</p>
+    </article>
+    <article class="card kpi">
+      <span class="kpi-icon ticket"><app-icon name="ticket" /></span>
+      <p class="kpi-label">Jugadas</p>
+      <p class="kpi-value">{{ playsCount() }}</p>
+    </article>
+    <article class="card kpi">
+      <span class="kpi-icon best"><app-icon name="trophy" /></span>
+      <p class="kpi-label">Mejor semana</p>
+      @if (bestWeek(); as b) {
+        <p class="kpi-value">{{ b.won | currency: 'EUR' }}</p>
+        <p class="kpi-foot">{{ b.week_start | date: 'd MMM' }} · {{ b.responsible }}</p>
+      } @else {
+        <p class="kpi-value muted">—</p>
+      }
+    </article>
+  </section>
+
+  <!-- ============ Gráfico ============ -->
+  <section class="card">
+    <div class="card-title">
+      <span>Evolución acumulada</span>
+      <span class="legend">
+        <span><i class="dot inv"></i>Invertido</span>
+        <span><i class="dot won"></i>Ganado</span>
+      </span>
+    </div>
+    <div class="chart-wrap">
+      <svg [attr.viewBox]="'0 0 ' + chart.w + ' ' + chart.h" role="img"
+           aria-label="Evolución acumulada de lo invertido frente a lo ganado">
+        <defs>
+          <linearGradient id="gInv" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#e5484d" stop-opacity=".22" />
+            <stop offset="1" stop-color="#e5484d" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="gWon" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#12b76a" stop-opacity=".28" />
+            <stop offset="1" stop-color="#12b76a" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        @for (t of yTicks(); track t.v) {
+          <line class="grid" x1="56" [attr.x2]="chart.w - 16" [attr.y1]="t.y" [attr.y2]="t.y" />
+          <text class="axis" x="48" [attr.y]="t.y + 4" text-anchor="end">{{ t.v | currency: 'EUR' : 'symbol' : '1.0-0' }}</text>
+        }
+        @for (l of xLabels(); track l.label) {
+          <text class="axis" [attr.x]="l.x" [attr.y]="chart.h - 8" [attr.text-anchor]="l.anchor">{{ l.label | date: 'd MMM' }}</text>
+        }
+        <path [attr.d]="invArea()" fill="url(#gInv)" />
+        <path [attr.d]="wonArea()" fill="url(#gWon)" />
+        <path class="line-inv" [attr.d]="invPath()" />
+        <path class="line-won" [attr.d]="wonPath()" />
+        @if (lastDots(); as d) {
+          <circle class="dot-inv" [attr.cx]="d.x" [attr.cy]="d.inv" r="5" />
+          <circle class="dot-won" [attr.cx]="d.x" [attr.cy]="d.won" r="5" />
+        }
+      </svg>
+    </div>
+  </section>
+
+  <div class="two">
+    <!-- ============ Por persona ============ -->
+    <section class="card">
+      <h2 class="card-title">Por turno</h2>
+      <ul class="people">
+        @for (p of byPerson(); track p.profile.id) {
+          <li>
+            <app-avatar [name]="p.profile.display_name" [order]="p.profile.turn_order" [size]="40" />
+            <div class="person">
+              <div class="person-top">
+                <strong>{{ p.profile.display_name }}</strong>
+                <span class="muted">{{ p.weeks }} sem. · {{ p.plays }} jugadas</span>
+              </div>
+              <div class="bar small"><span [style.width.%]="p.share * 100"></span></div>
+              <div class="person-bottom">
+                <span>{{ p.invested | currency: 'EUR' }} invertido</span>
+                <span [class.pos]="p.won > 0">{{ p.won | currency: 'EUR' }} ganado</span>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- ============ Últimas semanas ============ -->
+    <section class="card">
+      <h2 class="card-title">Últimas semanas</h2>
+      <ul class="weeks">
+        @for (r of recent(); track r.week_id) {
+          <li>
+            <div>
+              <strong>Semana del {{ r.week_start | date: 'd MMM' }}</strong>
+              <span class="muted">{{ r.responsible }} · {{ r.plays_count }} jugadas</span>
+            </div>
+            <span class="amount" [class.pos]="r.balance > 0" [class.neg]="r.balance < 0">
+              {{ r.balance > 0 ? '+' : '' }}{{ r.balance | currency: 'EUR' }}
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
+  </div>
+}

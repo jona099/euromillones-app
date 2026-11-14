@@ -1,0 +1,38 @@
+<header class="topbar">
+  <div class="inner">
+    <a class="brand" routerLink="/dashboard" aria-label="Trébol, ir al resumen">
+      <app-logo [size]="34" />
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      @for (l of links; track l.path) {
+        <a [routerLink]="l.path" routerLinkActive="active">
+          <app-icon [name]="l.icon" [size]="18" />{{ l.label }}
+        </a>
+      }
+    </nav>
+
+    @if (auth.profile(); as me) {
+      <div class="me">
+        <app-avatar [name]="me.display_name" [order]="me.turn_order" [size]="34" />
+        <span class="me-name">{{ me.display_name }}</span>
+        <button type="button" class="logout" (click)="auth.logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+          <app-icon name="logout" [size]="18" />
+        </button>
+      </div>
+    }
+  </div>
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<nav class="tabbar" aria-label="Principal">
+  @for (l of links; track l.path) {
+    <a [routerLink]="l.path" routerLinkActive="active">
+      <app-icon [name]="l.icon" [size]="22" />
+      <span>{{ l.label }}</span>
+    </a>
+  }
+</nav>

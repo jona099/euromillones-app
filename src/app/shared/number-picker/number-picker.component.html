@@ -1,0 +1,23 @@
+<div class="head">
+  <span class="label">{{ label() }} <span class="count">{{ selected().length }}/{{ pick() }}</span></span>
+  <span class="actions">
+    <button type="button" class="link" (click)="randomize()">Al azar</button>
+    @if (selected().length) {
+      <button type="button" class="link" (click)="clear()">Borrar</button>
+    }
+  </span>
+</div>
+
+<div class="grid" [class.stars]="variant() === 'star'" role="group" [attr.aria-label]="label()">
+  @for (n of options(); track n) {
+    <button
+      type="button"
+      [class]="variant()"
+      [class.on]="isSelected(n)"
+      [disabled]="disabled() || (full() && !isSelected(n))"
+      [attr.aria-pressed]="isSelected(n)"
+      (click)="toggle(n)">
+      {{ n }}
+    </button>
+  }
+</div>

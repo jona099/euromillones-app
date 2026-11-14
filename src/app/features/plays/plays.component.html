@@ -1,0 +1,99 @@
+<section class="week-bar pattern-night">
+  <button type="button" class="nav-btn" (click)="move(-1)" aria-label="Semana anterior">
+    <app-icon name="left" />
+  </button>
+
+  @if (week(); as w) {
+    <div class="week-info">
+      @if (responsible(); as r) {
+        <app-avatar [name]="r.display_name" [order]="r.turn_order" [size]="44" />
+      }
+      <div>
+        <h1>Semana del {{ w.week_start | date: 'd MMMM' }}</h1>
+        <p>{{ isMyTurn() ? 'Te toca jugar a ti' : 'Juega ' + responsibleName() }}</p>
+      </div>
+    </div>
+
+    <dl class="week-stats">
+      <div><dt>Jugadas</dt><dd>{{ plays().length }}</dd></div>
+      <div><dt>Invertido</dt><dd>{{ total() | currency: 'EUR' }}</dd></div>
+    </dl>
+  }
+
+  <button type="button" class="nav-btn" (click)="move(1)" aria-label="Semana siguiente">
+    <app-icon name="right" />
+  </button>
+</section>
+
+@if (offset() !== 0) {
+  <button type="button" class="back-today" (click)="move(-offset())">Volver a la semana actual</button>
+}
+
+<div class="layout">
+  <form class="ticket" [formGroup]="form" (ngSubmit)="save()">
+    <header class="ticket-head">
+      <span>Nuevo boleto</span>
+      <span class="price">2,50 €</span>
+    </header>
+
+    <div class="ticket-body">
+      @if (!isMyTurn()) {
+        <p class="note">Esta semana le toca a {{ responsibleName() }}, pero puedes apuntar la jugada por él.</p>
+      }
+
+      <div class="draws" role="radiogroup" aria-label="Sorteo">
+        @for (d of drawDates(); track d) {
+          <label class="draw-opt">
+            <input type="radio" formControlName="draw_date" [value]="d" />
+            <span><small>{{ d | date: 'EEEE' }}</small>{{ d | date: 'd MMM' }}</span>
+          </label>
+        }
+      </div>
+
+      <app-number-picker formControlName="numbers" label="Elige 5 números" [max]="50" [pick]="5" />
+      <app-number-picker formControlName="stars" label="Elige 2 estrellas" [max]="12" [pick]="2" variant="star" />
+    </div>
+
+    <footer class="ticket-foot">
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+      <button class="btn-primary" type="submit" [disabled]="saving() || form.invalid">
+        <app-icon name="check" [size]="18" /> {{ saving() ? 'Guardando…' : 'Guardar jugada' }}
+      </button>
+    </footer>
+  </form>
+
+  <section class="list">
+    @if (loading()) {
+      <p class="muted">Cargando…</p>
+    } @else {
+      @for (d of drawDates(); track d) {
+        <div class="card draw-block">
+          <h2 class="card-title">
+            <span>{{ d | date: "EEEE d 'de' MMMM" }}</span>
+            <span class="chip">{{ playsOn(d).length }} {{ playsOn(d).length === 1 ? 'jugada' : 'jugadas' }}</span>
+          </h2>
+          @for (p of playsOn(d); track p.id) {
+            <div class="play" [class.won]="prizeByPlay().has(p.id)">
+              <app-combo [numbers]="p.numbers" [stars]="p.stars" />
+              <div class="play-meta">
+                @if (prizeByPlay().get(p.id); as amount) {
+                  <span class="prize">+{{ amount | currency: 'EUR' }}</span>
+                }
+                @if (profileOf(p.created_by); as by) {
+                  <app-avatar [name]="by.display_name" [order]="by.turn_order" [size]="26" [attr.title]="'Apuntada por ' + by.display_name" />
+                }
+                <button type="button" class="icon-btn" (click)="remove(p)" aria-label="Eliminar jugada">
+                  <app-icon name="x" [size]="16" />
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <p class="muted empty">Sin jugadas para este sorteo todavía.</p>
+          }
+        </div>
+      }
+    }
+  </section>
+</div>

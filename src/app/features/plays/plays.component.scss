@@ -1,0 +1,194 @@
+:host { display: grid; gap: 1.25rem; }
+
+/* ---------- Barra de semana ---------- */
+.week-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 1.25rem;
+}
+
+.week-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+
+  h1 { margin: 0; font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
+  p { margin: 0; color: rgb(255 255 255 / 0.7); font-weight: 600; }
+}
+
+.week-stats {
+  display: flex;
+  gap: 1.75rem;
+  margin: 0 0.5rem 0 0;
+
+  dt { font-size: 0.75rem; color: rgb(255 255 255 / 0.6); font-weight: 600; }
+  dd { margin: 0; font-size: 1.2rem; font-weight: 800; }
+}
+
+.nav-btn {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  flex: none;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  cursor: pointer;
+
+  &:hover { background: rgb(255 255 255 / 0.18); }
+}
+
+.back-today {
+  justify-self: center;
+  margin-top: -0.5rem;
+  border: 0;
+  background: none;
+  color: var(--clover-dark);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ---------- Boleto ---------- */
+.ticket {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.ticket-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  background: linear-gradient(100deg, var(--clover-dark), var(--clover));
+  color: #fff;
+  font-weight: 800;
+
+  .price {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.2);
+    font-size: 0.85rem;
+  }
+}
+
+.ticket-body {
+  display: grid;
+  gap: 1.4rem;
+  padding: 1.25rem;
+}
+
+/* Troquel del boleto */
+.ticket-foot {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-top: 2px dashed var(--line);
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: -0.75rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+  }
+  &::before { left: -0.75rem; }
+  &::after { right: -0.75rem; }
+}
+
+.note {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--gold-soft);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.draws { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+.draw-opt {
+  display: block;
+  cursor: pointer;
+
+  input { position: absolute; opacity: 0; pointer-events: none; }
+
+  span {
+    display: grid;
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--night);
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  small { font-size: 0.75rem; font-weight: 700; color: var(--muted); &::first-letter { text-transform: uppercase; } }
+
+  input:checked + span { border-color: var(--clover); background: var(--clover-soft); }
+  input:focus-visible + span { outline: 3px solid var(--clover); outline-offset: 2px; }
+}
+
+.error { margin: 0; color: var(--red); font-weight: 700; }
+
+/* ---------- Listado ---------- */
+.list { display: grid; gap: 1rem; }
+
+.draw-block .card-title span:first-child::first-letter { text-transform: uppercase; }
+
+.play {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.25rem;
+  border-top: 1px solid var(--line);
+
+  &.won {
+    margin-inline: -0.5rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-sm);
+    border-top-color: transparent;
+    background: linear-gradient(90deg, var(--clover-soft), #f4fcf8);
+    box-shadow: inset 3px 0 0 var(--clover);
+  }
+}
+
+.play-meta { display: flex; align-items: center; gap: 0.4rem; }
+.prize { font-weight: 800; color: var(--clover-dark); margin-right: 0.25rem; }
+.empty { margin: 0; font-size: 0.9rem; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .week-stats { display: none; }
+}
+
+@media (max-width: 480px) {
+  .week-bar { gap: 0.6rem; padding: 0.9rem; }
+  .week-info h1 { font-size: 1.1rem; }
+  .week-info app-avatar { display: none; }
+  .play { flex-wrap: wrap; }
+}

@@ -1,0 +1,88 @@
+:host { display: block; }
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.label { font-weight: 800; color: var(--night); }
+
+.count {
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.actions { display: flex; gap: 0.4rem; }
+
+.link {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--night);
+  cursor: pointer;
+
+  &:hover { border-color: var(--clover); color: var(--clover-dark); }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.4rem;
+
+  &.stars { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+}
+
+.ball,
+.star {
+  aspect-ratio: 1;
+  border: 0;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s, color 0.15s, box-shadow 0.15s;
+
+  &:disabled:not(.on) { opacity: 0.35; cursor: default; }
+  &:not(:disabled):active { transform: scale(0.88); }
+}
+
+.ball {
+  border-radius: 50%;
+  background: var(--surface-alt);
+  color: var(--night);
+
+  &:hover:not(:disabled) { box-shadow: inset 0 0 0 2px var(--night); }
+  &.on, &.on:hover {
+    background: radial-gradient(circle at 35% 30%, #2c4590, var(--night) 70%);
+    color: #fff;
+    box-shadow: 0 4px 10px -4px rgb(12 24 56 / 0.6);
+  }
+}
+
+.star {
+  background: #ece6cf;
+  color: var(--night);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  padding-top: 0.3rem;
+  font-size: 0.72rem;
+
+  &:hover:not(:disabled) { background: #f3dc8c; }
+  &.on, &.on:hover { background: var(--gold); }
+}
+
+@media (max-width: 520px) {
+  .grid { gap: 0.3rem; }
+  .grid.stars { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .ball { font-size: 0.78rem; }
+}
