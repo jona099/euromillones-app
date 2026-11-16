@@ -1,5 +1,7 @@
 import { Component, ElementRef, inject, signal } from '@angular/core';
+import { PushService } from '../../core/services/push.service';
 import { ACCENTS, ThemeMode, ThemeService } from '../../core/services/theme.service';
+import { ToastService } from '../toast/toast.service';
 import { IconComponent } from '../icon/icon.component';
 
 /** Botón de la topbar que abre el panel de apariencia: modo (claro/oscuro/sistema) y acento. */
@@ -12,7 +14,7 @@ import { IconComponent } from '../icon/icon.component';
   },
   template: `
     <button #trigger type="button" class="trigger" (click)="open.set(!open())"
-            [attr.aria-expanded]="open()" aria-controls="theme-panel" aria-label="Apariencia">
+            [attr.aria-expanded]="open()" aria-controls="theme-panel" aria-label="Apariencia y avisos">
       <app-icon name="palette" [size]="18" />
     </button>
 
@@ -40,6 +42,20 @@ import { IconComponent } from '../icon/icon.component';
             </button>
           }
         </div>
+
+        <p class="title push-title">Avisos</p>
+        @switch (push.state()) {
+          @case ('unsupported') { <p class="hint">Instala la app en la pantalla de inicio para recibir avisos.</p> }
+          @case ('denied') { <p class="hint">Has bloqueado las notificaciones. Actívalas en los ajustes del navegador.</p> }
+          @default {
+            <button type="button" class="push" role="switch" [attr.aria-checked]="push.state() === 'on'"
+                    [class.on]="push.state() === 'on'" [disabled]="pushBusy()" (click)="togglePush()">
+              <app-icon name="bell" [size]="16" />
+              <span>Jugadas, premios y recordatorio</span>
+              <i class="sw" aria-hidden="true"></i>
+            </button>
+          }
+        }
       </div>
     }
   `,
@@ -89,6 +105,20 @@ import { IconComponent } from '../icon/icon.component';
       font: inherit; font-size: 0.9rem; font-weight: 700; cursor: pointer; text-align: left;
     }
     .accent.on { border-color: var(--clover); background: var(--clover-soft); }
+    .push-title { margin-top: 1rem; }
+    .hint { margin: 0; font-size: 0.82rem; color: var(--muted); }
+    .push {
+      display: flex; align-items: center; gap: 0.6rem; width: 100%;
+      padding: 0.55rem 0.6rem; border: 1.5px solid var(--line); border-radius: 0.8rem;
+      background: var(--surface); color: var(--heading);
+      font: inherit; font-size: 0.86rem; font-weight: 700; cursor: pointer; text-align: left;
+    }
+    .push span { flex: 1; }
+    .push:disabled { opacity: 0.6; cursor: progress; }
+    .sw { position: relative; width: 2.2rem; height: 1.3rem; border-radius: 999px; background: var(--line-strong); transition: background 0.15s; flex: none; }
+    .sw::after { content: ''; position: absolute; top: 0.15rem; left: 0.15rem; width: 1rem; height: 1rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); transition: transform 0.15s; }
+    .push.on .sw { background: var(--clover); }
+    .push.on .sw::after { transform: translateX(0.9rem); }
     .swatch { display: inline-flex; }
     .swatch i {
       width: 1.05rem; height: 1.05rem; border-radius: 50%;
@@ -103,6 +133,9 @@ export class ThemeMenuComponent {
   protected readonly theme = inject(ThemeService);
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
+  protected readonly push = inject(PushService);
+  private readonly toast = inject(ToastService);
+  protected readonly pushBusy = signal(false);
   protected readonly open = signal(false);
   protected readonly accents = ACCENTS;
   protected readonly modes: { id: ThemeMode; label: string; icon: string }[] = [
@@ -113,6 +146,25 @@ export class ThemeMenuComponent {
 
   protected setMode(mode: ThemeMode): void {
     this.theme.setMode(mode);
+  }
+
+  protected async togglePush(): Promise<void> {
+    this.pushBusy.set(true);
+    try {
+      if (this.push.state() === 'on') {
+        await this.push.disable();
+        this.toast.success('Avisos desactivados en este dispositivo');
+      } else {
+        await this.push.enable();
+        this.toast.success('Avisos activados en este dispositivo');
+      }
+    } catch (e) {
+      console.error(e);
+      if (typeof Notification !== 'undefined' && Notification.permission === 'denied') this.push.state.set('denied');
+      else this.toast.error('No se pudieron cambiar los avisos.');
+    } finally {
+      this.pushBusy.set(false);
+    }
   }
 
   protected onDocClick(e: Event): void {
