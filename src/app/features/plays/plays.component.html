@@ -107,22 +107,41 @@
     <div class="card photos">
       <h2 class="card-title">
         <span>Boletos de la semana</span>
-        <label class="pill upload" [class.busy]="uploading()">
-          @if (uploading()) { <app-loader size="0.38rem" /> } @else { <app-icon name="camera" [size]="16" /> } {{ uploading() ? 'Subiendo…' : 'Añadir foto' }}
-          <input type="file" accept="image/*" capture="environment" multiple hidden
-                 [disabled]="uploading()" (change)="onFiles($any($event.target))" />
-        </label>
+        <span class="upload-actions">
+          <label class="pill upload camera" [class.busy]="uploading()">
+            <app-icon name="camera" [size]="16" /> Foto
+            <input type="file" accept="image/*" capture="environment" hidden
+                   [disabled]="uploading()" (change)="onFiles($any($event.target))" />
+          </label>
+          <label class="pill upload" [class.busy]="uploading()">
+            @if (uploading()) { <app-loader size="0.38rem" /> Subiendo… } @else { <app-icon name="clip" [size]="16" /> Adjuntar }
+            <input type="file" [accept]="accept" multiple hidden
+                   [disabled]="uploading()" (change)="onFiles($any($event.target))" />
+          </label>
+        </span>
       </h2>
       @if (photos().length) {
         <div class="thumbs">
           @for (p of photos(); track p.id) {
-            <button type="button" class="thumb" (click)="preview.set(p)" aria-label="Ver foto del boleto">
-              <img [src]="p.url" alt="Foto del boleto" loading="lazy" />
-            </button>
+            @if (isPdf(p.path)) {
+              <div class="thumb pdf">
+                <a [href]="p.url" target="_blank" rel="noopener" aria-label="Abrir boleto en PDF">
+                  <app-icon name="file" [size]="26" />
+                  <span>PDF</span>
+                </a>
+                <button type="button" class="thumb-del" (click)="removePhoto(p)" aria-label="Eliminar PDF del boleto">
+                  <app-icon name="x" [size]="13" />
+                </button>
+              </div>
+            } @else {
+              <button type="button" class="thumb" (click)="preview.set(p)" aria-label="Ver boleto">
+                <img [src]="p.url" alt="Boleto" loading="lazy" />
+              </button>
+            }
           }
         </div>
       } @else {
-        <p class="muted empty">Sube una foto del resguardo para tenerlo siempre a mano.</p>
+        <p class="muted empty">Haz una foto del resguardo o adjunta la captura o el PDF de la app (TuLotero, Loterías…).</p>
       }
     </div>
 

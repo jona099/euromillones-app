@@ -22,6 +22,7 @@ import { SkeletonComboComponent } from '../../shared/skeleton/skeleton-combo.com
 import { LoaderComponent } from '../../shared/loader/loader.component';
 import { delayedLoading } from '../../shared/skeleton/delayed-loading';
 
+import { TICKET_ACCEPT, isPdf } from '../../core/services/photos.service';
 import { ToastService } from '../../shared/toast/toast.service';
 
 @Component({
@@ -33,6 +34,8 @@ import { ToastService } from '../../shared/toast/toast.service';
 export class PlaysComponent implements OnInit {
   private readonly playsSvc = inject(PlaysService);
   private readonly toast = inject(ToastService);
+  protected readonly accept = TICKET_ACCEPT;
+  protected readonly isPdf = isPdf;
   private readonly prizesSvc = inject(PrizesService);
   private readonly favSvc = inject(FavoritesService);
   private readonly photoSvc = inject(PhotosService);
@@ -184,9 +187,10 @@ export class PlaysComponent implements OnInit {
     try {
       for (const f of files) await this.photoSvc.upload(w.id, f);
       this.photos.set(await this.photoSvc.getByWeek(w.id));
-      this.toast.success(files.length === 1 ? 'Foto subida' : `${files.length} fotos subidas`);
+      this.toast.success(files.length === 1 ? 'Boleto adjuntado' : `${files.length} archivos adjuntados`);
     } catch (e) {
-      this.error.set('No se pudo subir la foto. Prueba con otra imagen.');
+      const msg = e instanceof Error && /MB|admiten/.test(e.message) ? e.message : 'Prueba con otro archivo';
+      this.error.set(`No se pudo subir el archivo. ${msg}.`);
       console.error(e);
     } finally {
       this.uploading.set(false);
@@ -195,7 +199,7 @@ export class PlaysComponent implements OnInit {
 
   removePhoto(p: TicketPhoto): void {
     this.preview.set(null);
-    this.toast.undoable('Foto eliminada', {
+    this.toast.undoable(isPdf(p.path) ? 'PDF eliminado' : 'Imagen eliminada', {
       hide: () => this.photos.update(list => list.filter(x => x.id !== p.id)),
       restore: () => this.photos.update(list => (list.some(x => x.id === p.id) ? list : [...list, p])),
       commit: () => this.photoSvc.delete(p),
