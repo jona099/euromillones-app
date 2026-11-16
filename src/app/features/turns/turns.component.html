@@ -1,0 +1,104 @@
+<header class="head">
+  <h1 class="page-title">Turnos</h1>
+  <p class="muted">Quién juega cada semana, hasta dos años vista. Toca una semana para ver el detalle o cambiarla.</p>
+</header>
+
+@if (skeleton()) {
+  <section class="card" aria-busy="true">
+    <span class="sr-only" role="status">Cargando…</span>
+    <div class="cal-head"><app-skeleton w="2rem" h="2rem" variant="circle" /><app-skeleton w="9rem" h="1.1rem" /><app-skeleton w="2rem" h="2rem" variant="circle" /></div>
+    <div class="cal sk-mt">
+      @for (i of [].constructor(35); track $index) { <app-skeleton variant="circle" w="2.4rem" class="sk-day" /> }
+    </div>
+  </section>
+} @else if (error()) {
+  <section class="card"><p class="muted">No se pudo cargar el calendario. Revisa la conexión.</p></section>
+} @else if (!loading()) {
+  <section class="card calendar" [class.swapping]="swapping()">
+    <div class="cal-head">
+      <button type="button" class="nav" (click)="go(-1)" [disabled]="offset() === 0" aria-label="Mes anterior">
+        <app-icon name="left" [size]="20" />
+      </button>
+      <h2 class="month" aria-live="polite">{{ month() | date: 'MMMM y' }}</h2>
+      <button type="button" class="nav" (click)="go(1)" [disabled]="offset() === maxOffset" aria-label="Mes siguiente">
+        <app-icon name="right" [size]="20" />
+      </button>
+    </div>
+
+    @if (swapping()) {
+      <p class="swap-hint" role="status">
+        Toca la semana con la que quieres cambiar la de <strong>{{ selectedInfo()?.who?.display_name }}</strong>.
+        <button type="button" class="link" (click)="swapping.set(false)">Cancelar</button>
+      </p>
+    }
+
+    <div class="cal" role="grid" [attr.aria-label]="'Turnos de ' + (month() | date: 'MMMM y')">
+      @for (d of weekdays; track d) { <span class="wd" role="columnheader">{{ d }}</span> }
+      @for (row of grid(); track row[0].monday) {
+        @for (day of row; track day.date.getTime()) {
+          <button type="button" role="gridcell" class="day"
+                  [class.out]="!day.inMonth" [class.draw]="day.isDraw" [class.today]="day.isToday"
+                  [class.sel]="day.monday === selected()" [class.mine]="isMine(day.who)"
+                  [style.--c]="color(day.who)" [disabled]="busy()"
+                  (click)="pick(day)"
+                  [attr.aria-label]="(day.date | date: 'EEEE d MMMM') + ', turno de ' + (day.who?.display_name ?? '—') + (day.isDraw ? ', día de sorteo' : '')">
+            {{ day.date.getDate() }}
+          </button>
+        }
+      }
+    </div>
+
+    <div class="cal-foot">
+      <button type="button" class="link legend-toggle" (click)="legendOpen.set(!legendOpen())" [attr.aria-expanded]="legendOpen()">
+        Ver leyenda <app-icon [name]="legendOpen() ? 'left' : 'right'" [size]="14" class="chev" />
+      </button>
+      @if (offset() !== 0) { <button type="button" class="link" (click)="goToday()">Hoy</button> }
+    </div>
+
+    @if (legendOpen()) {
+      <ul class="legend">
+        @for (t of nextTurns(); track t.profile.id) {
+          <li><i class="dot" [style.--c]="color(t.profile)"></i>{{ t.profile.display_name }}@if (isMine(t.profile)) { (tú)}</li>
+        }
+        <li><i class="dot draw-sample"></i>Día de sorteo (martes y viernes)</li>
+        <li><i class="dot today-sample"></i>Hoy</li>
+      </ul>
+    }
+  </section>
+
+  @if (selectedInfo(); as s) {
+    <section class="card week">
+      <div class="week-top">
+        @if (s.who) { <app-avatar [name]="s.who.display_name" [order]="s.who.turn_order" [size]="44" /> }
+        <div>
+          <p class="eyebrow">
+            @if (s.current) { Esta semana } @else { Semana del {{ s.monday | date: 'd MMM' }} al {{ s.sunday | date: 'd MMM' }} }
+          </p>
+          <h2>Turno de {{ s.who?.display_name }}@if (isMine(s.who)) { <span class="you">tú</span> }</h2>
+          <p class="muted">Sorteos: {{ s.tue | date: 'EEEE d' }} y {{ s.fri | date: 'EEEE d' }}</p>
+        </div>
+      </div>
+      @if (!s.past) {
+        <button type="button" class="pill" (click)="swapping.set(!swapping())" [class.ok]="swapping()" [disabled]="busy()">
+          <app-icon name="shuffle" [size]="15" /> {{ swapping() ? 'Elige otra semana…' : 'Cambiar con otra semana' }}
+        </button>
+      }
+    </section>
+  }
+
+  <section class="card">
+    <h2 class="card-title">Próximos turnos</h2>
+    <ul class="next">
+      @for (t of nextTurns(); track t.profile.id) {
+        <li [class.mine]="isMine(t.profile)">
+          <app-avatar [name]="t.profile.display_name" [order]="t.profile.turn_order" [size]="36" />
+          <div>
+            <strong>{{ t.profile.display_name }}</strong>
+            <span class="muted">{{ t.count }} semanas en 2 años</span>
+          </div>
+          <span class="when">{{ t.next ? (t.next | date: 'd MMM') : '—' }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+}

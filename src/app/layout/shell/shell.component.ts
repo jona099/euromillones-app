@@ -30,6 +30,7 @@ export class ShellComponent implements OnInit {
   protected readonly links = [
     { path: '/dashboard', label: 'Resumen', icon: 'home' },
     { path: '/jugadas', label: 'Jugadas', icon: 'ticket' },
+    { path: '/turnos', label: 'Turnos', icon: 'calendar' },
     { path: '/premios', label: 'Premios', icon: 'trophy' },
     { path: '/historial', label: 'Historial', icon: 'history' },
     { path: '/pena', label: 'Peña', icon: 'users' },

@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-const COLORS = ['#4f6bff', '#ff7a45', '#12b76a'];
+export const AVATAR_COLORS = ['#4f6bff', '#ff7a45', '#12b76a'];
 
 /** Avatar con inicial; el color depende del turno para que cada amigo sea siempre reconocible. */
 @Component({
@@ -25,5 +25,5 @@ export class AvatarComponent {
   readonly order = input(0);
   readonly size = input(36);
   protected readonly initial = computed(() => this.name().charAt(0).toUpperCase());
-  protected readonly color = computed(() => COLORS[this.order() % COLORS.length]);
+  protected readonly color = computed(() => AVATAR_COLORS[this.order() % AVATAR_COLORS.length]);
 }
