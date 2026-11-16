@@ -13,6 +13,9 @@ webpush.setVapidDetails(
   Deno.env.get('VAPID_PRIVATE_KEY')!,
 );
 
+// Dirección pública de la app (GitHub Pages sirve bajo /euromillones-app/, no en la raíz)
+const APP_URL = (Deno.env.get('APP_URL') ?? 'https://jona099.github.io/euromillones-app/').replace(/\/?$/, '/');
+
 interface Sub { id: number; user_id: string; endpoint: string; p256dh: string; auth: string }
 interface Msg { title: string; body: string; url: string; tag: string }
 
@@ -25,6 +28,7 @@ Deno.serve(async req => {
     const job = type === 'play' ? onPlay(record)
       : type === 'prize' ? onPrize(record)
       : type === 'reminder' ? onReminder()
+      : type === 'test' ? onTest(record)
       : null;
     const result = job ? await job : null;
     if (!result) return json({ sent: 0 });
@@ -48,7 +52,7 @@ async function onPlay(p: { created_by: string; draw_date: string; numbers: numbe
     msg: {
       title: `🎟️ ${author} ha jugado para el ${fmtDate(p.draw_date)}`,
       body: `${nums}   ★ ${stars}`,
-      url: '/#/jugadas',
+      url: '#/jugadas',
       tag: `play-${p.draw_date}-${nums}-${stars}`,
     },
   };
@@ -65,7 +69,7 @@ async function onPrize(pr: { play_id: number; amount: number; category: string |
     msg: {
       title: `🏆 ¡Premio de ${amount}!`,
       body: `${author} ha apuntado un premio${cat}${play ? ` del sorteo del ${fmtDate(play.draw_date)}` : ''}.`,
-      url: '/#/premios',
+      url: '#/premios',
       tag: `prize-${pr.play_id}`,
     },
   };
@@ -84,8 +88,24 @@ async function onReminder() {
     msg: {
       title: '🍀 Hoy hay sorteo y te toca',
       body: `Echa la jugada del Euromillones antes de las 19:30 y apúntala en Trébol.`,
-      url: '/#/jugadas',
+      url: '#/jugadas',
       tag: `reminder-${today}`,
+    },
+  };
+}
+
+/** Prueba / aviso manual: a todos, o solo a un usuario con user_id. Admite title y body propios. */
+async function onTest(r?: { user_id?: string; title?: string; body?: string }) {
+  const to = r?.user_id
+    ? [r.user_id]
+    : ((await db.from('profiles').select('id')).data ?? []).map(p => p.id as string);
+  return {
+    to,
+    msg: {
+      title: r?.title || '🔔 Prueba de Trébol',
+      body: r?.body || 'Si ves esto, las notificaciones funcionan en este dispositivo.',
+      url: '#/dashboard',
+      tag: `test-${Date.now()}`,
     },
   };
 }
@@ -102,10 +122,10 @@ async function send(userIds: string[], msg: Msg): Promise<number> {
     notification: {
       title: msg.title,
       body: msg.body,
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-192.png',
+      icon: `${APP_URL}icons/icon-192.png`,
+      badge: `${APP_URL}icons/badge-96.png`,   // silueta blanca para la barra de estado (Android)
       tag: msg.tag,
-      data: { onActionClick: { default: { operation: 'navigateLastFocusedOrOpen', url: msg.url } } },
+      data: { onActionClick: { default: { operation: 'navigateLastFocusedOrOpen', url: APP_URL + msg.url } } },
     },
   });
 
